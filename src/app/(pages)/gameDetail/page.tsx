@@ -2,11 +2,11 @@
 import { useRouter } from "next/navigation";
 import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
 
-export default function Home() {
+export default function GameDetailPage() {
   const router = useRouter();
   return (
-    <DefaultTemplate title="Top Page">
-      <button onClick={() => router.push('/gameDetail')}>GameDetail</button>
+    <DefaultTemplate title="Game Detail Page">
+      <button onClick={() => router.push('/play')}>Play</button>
     </DefaultTemplate>
   );
 }
