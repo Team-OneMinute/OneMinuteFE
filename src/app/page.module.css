@@ -3,7 +3,6 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 6rem;
   min-height: 100vh;
 }
 
@@ -103,6 +102,16 @@
   position: absolute;
   filter: blur(45px);
   transform: translateZ(0);
+}
+
+.CardGame {
+  display: flex;
+  flex-direction: row; /* 水平方向に要素を並べる */
+  justify-content: space-between; /* カード間に均等なスペースを設ける */
+  align-items: center; /* 縦方向の中心に揃える */
+  flex-wrap: wrap; /* カードが多い場合は折り返す */
+  padding: 6rem;
+  min-height: 100vh;
 }
 
 .logo {
