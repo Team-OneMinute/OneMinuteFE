@@ -54,7 +54,7 @@ export default function Home() {
   };
 
   return (
-    <main className={styles.main}>
+    <>
       <DefaultTemplate title="Top Page">
       <div>
         {games.map((game) => (
@@ -70,6 +70,6 @@ export default function Home() {
       </div>
       <button onClick={() => router.push('/gameDetail')}>GameDetail</button>
       </DefaultTemplate>
-    </main>
+    </>
   );
 }
