@@ -1,7 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation";
 import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
-import styles from "./page.module.css";
 
 // component
 import GameCard from "./component/gameCard";
@@ -69,6 +68,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+      <button onClick={() => router.push('/gameDetail')}>GameDetail</button>
       </DefaultTemplate>
     </main>
   );
