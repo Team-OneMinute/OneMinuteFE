@@ -5,7 +5,7 @@ import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
 // component
 import GameCard from "./component/gameCard";
 
-import { firebaseConfig } from './firebaseConfig';
+import { firebaseConfig } from "./firebaseConfig";
 
 import { initializeApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
