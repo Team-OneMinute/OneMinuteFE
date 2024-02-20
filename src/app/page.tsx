@@ -16,12 +16,6 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const router = useRouter();
 
-  type Game = {
-    id: string;
-    title: string;
-    imageUrl: string;
-    maxPod: number;
-  };
   const [games, setGames] = useState<Game[]>([]);
 
   useEffect(() => {
@@ -30,6 +24,8 @@ export default function Home() {
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
       const gameList = await getGameList(db);
+
+      // HACK: sortは、Fetchのタイミングでsortかけたほうが早い場合はリファクタ
       const sortedGames = await gameList.sort((a, b) => a.maxPod - b.maxPod);
       setGames(sortedGames);
     })();
@@ -53,6 +49,13 @@ export default function Home() {
     return gameList;
   };
 
+  const gameDetailPath = (id: string) =>{
+    const defaltGameDetailPath = "/gameDetail";
+    const delimiter = "?";
+    const param = "id="
+    return defaltGameDetailPath + delimiter + param + id;
+  }
+
   return (
     <>
       <DefaultTemplate title="Top Page">
@@ -62,13 +65,12 @@ export default function Home() {
             <GameCard
               url={game.imageUrl}
               title={game.title}
-              navigateTo="/destination-url"
+              navigateTo={gameDetailPath(game.id)}
               earn={game.maxPod}
             />
           </div>
         ))}
       </div>
-      <button onClick={() => router.push('/gameDetail')}>GameDetail</button>
       </DefaultTemplate>
     </>
   );
