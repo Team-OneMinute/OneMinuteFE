@@ -5,13 +5,14 @@ import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
 // component
 import GameCard from "./component/gameCard";
 
+// firebase
 import { firebaseConfig } from "./firebaseConfig";
-
 import { initializeApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { useEffect, useState } from "react";
 
+import styled from "styled-components";
 
 export default function Home() {
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function Home() {
   }
 
   return (
-    <>
+    <Background>
       <DefaultTemplate title="Top Page">
       <div>
         {games.map((game) => (
@@ -72,6 +73,13 @@ export default function Home() {
         ))}
       </div>
       </DefaultTemplate>
-    </>
+    </Background>
   );
 }
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(/static/images/background/background1.png);
+    background-size:100% auto;
+`;

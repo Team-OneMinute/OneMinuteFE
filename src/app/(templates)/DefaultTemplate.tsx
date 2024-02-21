@@ -12,7 +12,7 @@ const BodyArea = styled.div`
 `;
 
 const FooterArea = styled.div`
-  height: 48px;
+  height: 1200px;
   display: flex;
   flex-direction: row;
   align-items: center;
