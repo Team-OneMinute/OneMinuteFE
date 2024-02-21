@@ -2,84 +2,86 @@
 import { useRouter } from "next/navigation";
 import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
 
-// component
-import GameCard from "./component/gameCard";
-
 // firebase
-import { firebaseConfig } from "./firebaseConfig";
-import { initializeApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import { getTopWanted, getNewWanted, getHotWanted } from "./service/wanted";
 import { useEffect, useState } from "react";
+
+// component
+import WantedPoster from "./component/wantedPoster"
 
 import styled from "styled-components";
 
 export default function Home() {
-  const router = useRouter();
+  // TODO: loading
 
-  const [games, setGames] = useState<Game[]>([]);
+  const router = useRouter();
+  const [topWanted, setTopWanted] = useState<Wanted[]>([]);
+  const [newWanted, setNewWanted] = useState<Wanted[]>([]);
+  const [hotWanted, setHotWanted] = useState<Wanted[]>([]);
 
   useEffect(() => {
     (async () => {
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      const gameList = await getGameList(db);
-
-      // HACK: sortは、Fetchのタイミングでsortかけたほうが早い場合はリファクタ
-      const sortedGames = await gameList.sort((a, b) => a.maxPod - b.maxPod);
-      setGames(sortedGames);
+      // HACK:非同期で取ったほうがいいかも
+      // Potが大きいWanted取得 limit number 
+      const topWanted = await getTopWanted(9);
+      const newWanted = await getNewWanted(2);
+      const hotWanted = await getHotWanted(5);
+      setTopWanted(topWanted);
+      setNewWanted(newWanted);
+      setHotWanted(hotWanted);
     })();
   }, []);
 
-  // Get game data from firebase
-  const getGameList = async (db: Firestore) => {
-    const gamesCollection = collection(db, 'games');
-    const gameDocs = await getDocs(gamesCollection);
-    const gamesData = gameDocs.docs.map(doc => doc.data());
-
-    const gameList = gamesData.map(data => {
-      return {
-        id: String(data.id),
-        title: String(data.title),
-        imageUrl: String(data.image_url),
-        maxPod: Number(data.max_pot),
-      } as Game;
-    });
-    console.log(gameList);
-    return gameList;
-  };
-
-  const gameDetailPath = (id: string) =>{
-    const defaltGameDetailPath = "/gameDetail";
-    const delimiter = "?";
-    const param = "id="
-    return defaltGameDetailPath + delimiter + param + id;
-  }
-
   return (
-    <Background>
       <DefaultTemplate title="Top Page">
-      <div>
-        {games.map((game) => (
-          <div key={game.id}>
-            <GameCard
-              url={game.imageUrl}
-              title={game.title}
-              navigateTo={gameDetailPath(game.id)}
-              earn={game.maxPod}
-            />
-          </div>
-        ))}
-      </div>
+        <BigPotArea>BIG POT</BigPotArea>
+        <WantedPosterArea>
+          {topWanted.map((wanted) => (
+            <div key={wanted.gameId}>
+                <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
+            </div>
+          ))}
+        </WantedPosterArea>
+        <HotArea>Hot Wanted</HotArea>
+        <WantedPosterArea>
+          {hotWanted.map((wanted) => (
+              <div key={wanted.gameId}>
+                <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
+              </div>
+            ))}
+        </WantedPosterArea>
+        <NewArea>New Wanted</NewArea>
+        <WantedPosterArea>
+          {newWanted.map((wanted) => (
+            <div key={wanted.gameId}>
+              <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
+            </div>
+          ))}
+        </WantedPosterArea>
       </DefaultTemplate>
-    </Background>
   );
 }
 
-const Background = styled.div`
-    width: 100%;
-    height: 100%;
-    background-image: url(/static/images/background/background1.png);
-    background-size:100% auto;
+const WantedPosterArea = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+`;
+
+const BigPotArea = styled.div`
+  font-size: 6vw;
+  font-weight:bold;
+  color: #FFFFFF;
+`;
+
+const HotArea = styled.div`
+  font-size: 6vw;
+  font-weight:bold;
+  color: #FFFFFF;
+`;
+
+const NewArea = styled.div`
+  font-size: 6vw;
+  font-weight:bold;
+  color: #FFFFFF;
 `;

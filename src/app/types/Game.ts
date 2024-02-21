@@ -3,4 +3,7 @@ type Game = {
     title: string;
     imageUrl: string;
     maxPod: number;
+    topUserId: string;
+    is_open: boolean;
+    start: Date;
   };

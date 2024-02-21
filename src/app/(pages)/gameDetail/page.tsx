@@ -4,7 +4,7 @@ import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
 import { useEffect, useState } from "react";
 
 // firebase
-import { firebaseConfig } from "../../firebaseConfig";
+import { firebaseConfig } from "../../infrastructure/firebase/firebaseConfig";
 import { initializeApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
