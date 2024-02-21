@@ -12,7 +12,7 @@ const BodyArea = styled.div`
 `;
 
 const FooterArea = styled.div`
-  height: 48px;
+  height: 1200px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -25,20 +25,27 @@ const FooterButton = styled.div`
   align-items: center;
 `;
 
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(/static/images/background/background1.png);
+    background-size:100% auto;
+`;
+
 const getFooterArea = (movePage: (uri: string) => void) => {
   return (
     <FooterArea>
       <FooterButton>
-        <button onClick={() => movePage('/')}>top</button>
+        <button onClick={() => movePage('/')}>HOT</button>
       </FooterButton>
       <FooterButton>
-        <button onClick={() => movePage('/')}>ranking</button>
+        <button onClick={() => movePage('/')}>LEGEND</button>
       </FooterButton>
       <FooterButton>
-        <button onClick={() => movePage('/user')}>user</button>
+        <button onClick={() => movePage('/allGames')}>ALL GAMES</button>
       </FooterButton>
       <FooterButton>
-        <button onClick={() => movePage('/')}>market</button>
+        <button onClick={() => movePage('/')}>SHOP</button>
       </FooterButton>
     </FooterArea>
   );
@@ -55,7 +62,7 @@ export const DefaultTemplate: React.FC<Props> = ({ title, children }) => {
   const movePage = (uri: string) => router.push(uri);
 
   return (
-    <>
+    <Background>
       <HeaderArea>
         {title}
       </HeaderArea>
@@ -63,6 +70,6 @@ export const DefaultTemplate: React.FC<Props> = ({ title, children }) => {
         {children}
       </BodyArea>
       {getFooterArea(movePage)}
-    </>
+    </Background>
   );
 }
