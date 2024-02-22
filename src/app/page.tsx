@@ -66,6 +66,8 @@ const WantedPosterArea = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  margin-left: 6vw;
+  margin-right: 6vw;
 `;
 
 const BigPotArea = styled.div`
