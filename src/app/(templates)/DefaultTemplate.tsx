@@ -67,25 +67,6 @@ const UnActiveNavigationButton = styled.button`
   cursor: pointer;
 `;
 
-// const getFooterArea = (movePage: (uri: string) => void) => {
-//   return (
-//     <FooterArea>
-//       <FooterButton>
-//         <button onClick={() => movePage('/')}>HOT</button>
-//       </FooterButton>
-//       <FooterButton>
-//         <button onClick={() => movePage('/')}>LEGEND</button>
-//       </FooterButton>
-//       <FooterButton>
-//         <button onClick={() => movePage('/allGames')}>ALL GAMES</button>
-//       </FooterButton>
-//       <FooterButton>
-//         <button onClick={() => movePage('/')}>SHOP</button>
-//       </FooterButton>
-//     </FooterArea>
-//   );
-// }
-
 const getTopNavigationArea = (movePage: (uri: string) => void) => {
   return (
     <TopNavigationArea>
