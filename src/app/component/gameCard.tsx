@@ -12,45 +12,53 @@ interface props {
 const GameCard: React.FC<props> = ({ url, title, navigateTo, earn }) => {
   return (
     <CardContainer onClick={() => window.location.href = navigateTo}>
-      <Thumbnail src={url} alt={title}/>
-      <TextContainer>
-        <Title>{title}</Title>
-        <Earn>{earn.toLocaleString()} $</Earn>
-      </TextContainer>
+        <GameBackground src={url}/>
+        <Thumbnail src={url}/>
+        <GameInfo>
+            <h2>{title}</h2>
+            <Earn>3,500円</Earn>
+            <button type="button">Ranking</button>
+        </GameInfo>
+
     </CardContainer>
   );
 };
 
 const CardContainer = styled.div`
-    cursor: pointer;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.1s;
-    width: fit-content;
-    padding: 16px;
-    border-radius: 5px;
-    background-color: #fff;
-    text-align: center;
-    margin: auto;
+  position: relative;
+  width: 350px;
+  height: 200px;
+  margin: 5px;
+`;
+
+const GameBackground = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 const Thumbnail = styled.img`
-    width: 50px;
-    height: 50px;
-    margin-bottom: 8px;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 50px;
+  height: 50px;
 `;
 
-const TextContainer = styled.div`
-    font-size: 16px;
-    color: #000;
+const GameInfo = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  text-align: right;
 `;
 
-const Title = styled.div`
+const Earn = styled.p`
+    color: #4CAF50;
+`;
+
+const GameTitle = styled.div`
     margin-bottom: 4px;
     font-weight: bold;
-`;
-
-const Earn = styled.div`
-    color: #4CAF50;
 `;
 
 export default GameCard;
