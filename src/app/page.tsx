@@ -1,89 +1,48 @@
 "use client"
-import { useRouter } from "next/navigation";
-import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
 
-// firebase
-import { getTopWanted, getNewWanted, getHotWanted } from "./service/wanted";
-import { useEffect, useState } from "react";
+import { useRef, useEffect } from 'react';
+import { register, SwiperContainer } from "swiper/element/bundle";
+import "swiper/css";
+import "swiper/css/navigation";
+import Swiper from "swiper/types/swiper-class";
+import styles from "./page.module.css";
 
-// component
-import WantedPoster from "./component/wantedPoster"
-
-import styled from "styled-components";
+register();
 
 export default function Home() {
-  // TODO: loading
-
-  const router = useRouter();
-  const [topWanted, setTopWanted] = useState<Wanted[]>([]);
-  const [newWanted, setNewWanted] = useState<Wanted[]>([]);
-  const [hotWanted, setHotWanted] = useState<Wanted[]>([]);
+  const swiperElRef = useRef<SwiperContainer>(null);
 
   useEffect(() => {
-    (async () => {
-      // HACK:非同期で取ったほうがいいかも
-      // Potが大きいWanted取得 limit number 
-      const topWanted = await getTopWanted(9);
-      const newWanted = await getNewWanted(2);
-      const hotWanted = await getHotWanted(5);
-      setTopWanted(topWanted);
-      setNewWanted(newWanted);
-      setHotWanted(hotWanted);
-    })();
-  }, []);
+    function onSwiperSlideChange(event: CustomEvent<[e: Swiper]>) {
+      console.log("realIndex", event.detail[0].realIndex);
+    }
+
+    const ref = swiperElRef?.current;
+    // swiper@v11.xから 「prefix `swiper` + swiper-element.d.ts内のcustomEvent名」を結合させたイベント名を指定する必要がある
+    // @ts-ignore
+    ref?.addEventListener("swiperslidechange", onSwiperSlideChange);
+    return () => {
+      // @ts-ignore
+      ref?.removeEventListener("swiperslidechange", onSwiperSlideChange);
+    };
+  }, [swiperElRef]);
 
   return (
-      <DefaultTemplate title="Top Page">
-        <BigPotArea>BIG POT</BigPotArea>
-        <WantedPosterArea>
-          {topWanted.map((wanted) => (
-            <div key={wanted.gameId}>
-                <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
-            </div>
-          ))}
-        </WantedPosterArea>
-        <HotArea>Hot Wanted</HotArea>
-        <WantedPosterArea>
-          {hotWanted.map((wanted) => (
-              <div key={wanted.gameId}>
-                <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
-              </div>
-            ))}
-        </WantedPosterArea>
-        <NewArea>New Wanted</NewArea>
-        <WantedPosterArea>
-          {newWanted.map((wanted) => (
-            <div key={wanted.gameId}>
-              <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
-            </div>
-          ))}
-        </WantedPosterArea>
-      </DefaultTemplate>
+    <div>
+      <swiper-container
+        ref={swiperElRef}
+        slides-per-view="1"
+        initial-slide="0"
+        centered-slides="false"
+        speed="400"
+        class={styles.swiper}
+      >
+        <swiper-slide key="1">1</swiper-slide>
+        <swiper-slide key="2">2</swiper-slide>
+        <swiper-slide key="3">3</swiper-slide>
+        <swiper-slide key="4">4</swiper-slide>
+        <swiper-slide key="5">5</swiper-slide>
+      </swiper-container>
+    </div>
   );
-}
-
-const WantedPosterArea = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-left: 6vw;
-  margin-right: 6vw;
-`;
-
-const BigPotArea = styled.div`
-  font-size: 6vw;
-  font-weight:bold;
-  color: #FFFFFF;
-`;
-
-const HotArea = styled.div`
-  font-size: 6vw;
-  font-weight:bold;
-  color: #FFFFFF;
-`;
-
-const NewArea = styled.div`
-  font-size: 6vw;
-  font-weight:bold;
-  color: #FFFFFF;
-`;
+};
