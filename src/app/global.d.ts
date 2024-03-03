@@ -35,6 +35,7 @@ declare global {
       children?: ReactNode;
       speed?: string;
       class?: string;
+      loop?: string;
     }
     interface SwiperSlideAttributes {
       // 指定したい値を適宜追加する
