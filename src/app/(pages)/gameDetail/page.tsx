@@ -1,6 +1,5 @@
 "use client"
 import { useRouter, useSearchParams } from "next/navigation";
-import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
 import { useEffect, useState } from "react";
 
 // firebase
@@ -46,10 +45,9 @@ export default function GameDetailPage() {
     return ranking;
   };
 
-
   return (
-    <DefaultTemplate title="Game Detail Page">
+    <div>
       <button onClick={() => router.push('/play')}>Play</button>
-    </DefaultTemplate>
+    </div>
   );
 }
