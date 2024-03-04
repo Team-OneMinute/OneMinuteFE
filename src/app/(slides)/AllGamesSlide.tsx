@@ -18,18 +18,18 @@ const AllGamesSlide: React.FC<props> = ({ games }) => {
     
     return (
         <Background>
-                <GameCardArea>
-          {games.map((game) => (
-            <div key={game.id}>
-              <GameCard
-                url={game.imageUrl}
-                title={game.title}
-                navigateTo={gameDetailPath(game.id)}
-                earn={game.maxPod}
-              />
-            </div>
-          ))}
-        </GameCardArea>
+            <GameCardArea>
+                {games.map((game) => (
+                    <div key={game.id}>
+                        <GameCard
+                            url={game.imageUrl}
+                            title={game.title}
+                            navigateTo={gameDetailPath(game.id)}
+                            earn={game.maxPod}
+                        />
+                    </div>
+                ))}
+            </GameCardArea>
         </Background>
     );
   };
