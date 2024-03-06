@@ -71,7 +71,7 @@ export default function App() {
           <AllGamesSlide games = {games}></AllGamesSlide>
         </SwiperSlide>
         <SwiperSlide>
-          <ShopSlide pageName = "shop slide"></ShopSlide>        
+          <ShopSlide pageName = "shop slide"></ShopSlide>
         </SwiperSlide>
       </Swiper>
     </div>

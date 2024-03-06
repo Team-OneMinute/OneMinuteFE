@@ -1,21 +1,18 @@
 "use client"
 import GameCanvas from "@/app/(gameComponents)/GameCanvas";
-import { useRouter } from "next/navigation";
-import styled from "styled-components";
-
-const CanvasArea = styled.div`
-  border: solid 1px #000;
-`;
+import { useSearchParams } from "next/navigation";
 
 export default function GamePlayingPage() {
-  const router = useRouter();
-  return (
-    <>
-      <div>ゲーム画面</div>
-      <button onClick={() => router.push('/gameDetail')}>戻る</button>
-      <CanvasArea>
-        <GameCanvas />
-      </CanvasArea>
-    </>
-  );
+  const params = useSearchParams();
+  const id = params.get("id") ?? "";
+  switch (id) {
+    case "0001":
+      return <GameCanvas />
+    case "0002":
+      return <GameCanvas />
+    case "0003":
+      return <GameCanvas />
+    default: // TODO: クライアントで設定していないgameId、またはURLにgameIdがない場合の処理
+      return <GameCanvas />
+  }
 }

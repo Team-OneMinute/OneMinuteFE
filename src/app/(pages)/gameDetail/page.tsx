@@ -47,7 +47,7 @@ export default function GameDetailPage() {
 
   return (
     <div>
-      <button onClick={() => router.push('/play')}>Play</button>
+      <button onClick={() => router.push(`/play?id=${gameId}`)}>Play</button>
     </div>
   );
 }
