@@ -1,23 +1,37 @@
 "use client"
-import { useRouter } from "next/navigation";
-import { DefaultTemplate } from "@/app/(templates)/DefaultTemplate";
+import React, { useEffect, useState } from 'react';
 
-// firebase
+// Swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { Pagination } from 'swiper/modules';
+import './styles.css';
+
+// components
 import { getTopWanted, getNewWanted, getHotWanted } from "./service/wanted";
-import { useEffect, useState } from "react";
+import { getAllActiveGames } from "./service/game";
 
-// component
-import WantedPoster from "./component/wantedPoster"
+// slides
+import HotPotSlide from './(slides)/HotPotSlide';
+import LegendSlide from './(slides)/LegendSlide';
+import AllGamesSlide from './(slides)/AllGamesSlide';
+import ShopSlide from './(slides)/ShopSlide';
 
-import styled from "styled-components";
+const pageName = ["HOT", "LEGEND", "ALL", "SHOP"];
 
-export default function Home() {
-  // TODO: loading
-
-  const router = useRouter();
+export default function App() {
   const [topWanted, setTopWanted] = useState<Wanted[]>([]);
   const [newWanted, setNewWanted] = useState<Wanted[]>([]);
   const [hotWanted, setHotWanted] = useState<Wanted[]>([]);
+  const [games, setGames] = useState<Game[]>([]);
+
+  const pagination = {
+    clickable: true,
+    renderBullet: function (index: number, className: any) {
+      return '<span class="' + className + '">' + pageName[index] + '</span>';
+    },
+  };
 
   useEffect(() => {
     (async () => {
@@ -29,61 +43,37 @@ export default function Home() {
       setTopWanted(topWanted);
       setNewWanted(newWanted);
       setHotWanted(hotWanted);
+
+      // Games List
+      const gameList = await getAllActiveGames();
+      // HACK: sortは、Fetchのタイミングでsortかけたほうが早い場合はリファクタ
+      const sortedGames = await gameList.sort((a, b) => a.maxPod - b.maxPod);
+      setGames(sortedGames);
     })();
   }, []);
 
   return (
-      <DefaultTemplate title="Top Page">
-        <BigPotArea>BIG POT</BigPotArea>
-        <WantedPosterArea>
-          {topWanted.map((wanted) => (
-            <div key={wanted.gameId}>
-                <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
-            </div>
-          ))}
-        </WantedPosterArea>
-        <HotArea>Hot Wanted</HotArea>
-        <WantedPosterArea>
-          {hotWanted.map((wanted) => (
-              <div key={wanted.gameId}>
-                <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
-              </div>
-            ))}
-        </WantedPosterArea>
-        <NewArea>New Wanted</NewArea>
-        <WantedPosterArea>
-          {newWanted.map((wanted) => (
-            <div key={wanted.gameId}>
-              <WantedPoster userImage={wanted.userImageUrl} frameNo="1"/>
-            </div>
-          ))}
-        </WantedPosterArea>
-      </DefaultTemplate>
+    <div>
+      <Swiper
+        pagination={pagination}
+        modules={[Pagination]}
+      >
+        <SwiperSlide>
+          <HotPotSlide 
+            topWanted = {topWanted}
+            newWanted = {newWanted}
+            hotWanted = {hotWanted}/>
+        </SwiperSlide>
+        <SwiperSlide>
+          <LegendSlide pageName = "Legend slide"></LegendSlide>
+        </SwiperSlide>
+        <SwiperSlide>
+          <AllGamesSlide games = {games}></AllGamesSlide>
+        </SwiperSlide>
+        <SwiperSlide>
+          <ShopSlide pageName = "shop slide"></ShopSlide>        
+        </SwiperSlide>
+      </Swiper>
+    </div>
   );
-}
-
-const WantedPosterArea = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-left: 6vw;
-  margin-right: 6vw;
-`;
-
-const BigPotArea = styled.div`
-  font-size: 6vw;
-  font-weight:bold;
-  color: #FFFFFF;
-`;
-
-const HotArea = styled.div`
-  font-size: 6vw;
-  font-weight:bold;
-  color: #FFFFFF;
-`;
-
-const NewArea = styled.div`
-  font-size: 6vw;
-  font-weight:bold;
-  color: #FFFFFF;
-`;
+};
