@@ -17,11 +17,14 @@ export const getAllActiveGames = async () =>{
 
     const gameList = gamesData.map(data => {
       return {
-        id: String(data.id),
-        title: String(data.title),
-        imageUrl: String(data.image_url),
-        maxPod: Number(data.max_pot),
+        gameId: String(data.id),
+        gameTitle: String(data.title),
+        gameImageUrl: String(data.game_image_url),
+        gameThumbnailUrl: String(data.thumbnail_url),
+        topAmount: Number(data.max_pot),
         topUserId: String(data.top_user_id),
+        isOpen: Boolean(data.is_open),
+        start: data.start
       } as Game;
     });
     return gameList;

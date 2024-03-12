@@ -20,8 +20,11 @@ export const getTopWanted = async (limitNum: number) =>{
       return {
         gameId: String(data.id),
         userId: String(data.top_user_id),
-        userImageUrl: "/static/images/temp/tmpUser.png",
-        potAmount: data.pot_amount,
+        userImageUrl: "/static/images/temp/WantedSample.jpg",
+        topAmount: data.max_pot,
+        gameTitle: String(data.title),
+        gameImageUrl: String(data.game_image_url),
+        gameThumbnailUrl: String(data.thumbnail_url),
       } as Wanted;
     });
     return wantedList;
@@ -47,8 +50,11 @@ export const getNewWanted = async (limitNum: number) =>{
     return {
       gameId: String(data.id),
       userId: String(data.top_user_id),
-      userImageUrl: "/static/images/temp/tmpUser.png",
-      potAmount: data.pot_amount,
+      userImageUrl: "/static/images/temp/WantedSample.jpg",
+      topAmount: data.max_pot,
+      gameTitle: String(data.title),
+      gameImageUrl: String(data.game_image_url),
+      gameThumbnailUrl: String(data.thumbnail_url),
     } as Wanted;
   });
   return wantedList;
@@ -76,8 +82,11 @@ export const getHotWanted = async (limitNum: number) =>{
     return {
       gameId: String(data.id),
       userId: String(data.top_user_id),
-      userImageUrl: "/static/images/temp/tmpUser.png",
-      potAmount: data.pot_amount,
+      userImageUrl: "/static/images/temp/WantedSample.jpg",
+      topAmount: data.max_pot,
+      gameTitle: String(data.title),
+      gameImageUrl: String(data.game_image_url),
+      gameThumbnailUrl: String(data.thumbnail_url),
     } as Wanted;
   });
   return wantedList;

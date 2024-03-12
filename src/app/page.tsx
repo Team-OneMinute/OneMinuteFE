@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react';
+import styled from "styled-components";
 
 // Swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -13,67 +14,52 @@ import { getTopWanted, getNewWanted, getHotWanted } from "./service/wanted";
 import { getAllActiveGames } from "./service/game";
 
 // slides
-import HotPotSlide from './(slides)/HotPotSlide';
+import HotPotSlide from './(slides)/GameWantedSlideSlide';
 import LegendSlide from './(slides)/LegendSlide';
 import AllGamesSlide from './(slides)/AllGamesSlide';
-import ShopSlide from './(slides)/ShopSlide';
+import ShopSlide from './(slides)/UserSlide';
 
-const pageName = ["HOT", "LEGEND", "ALL", "SHOP"];
+const pageName = ["Game", "Legend", "User"];
 
 export default function App() {
-  const [topWanted, setTopWanted] = useState<Wanted[]>([]);
-  const [newWanted, setNewWanted] = useState<Wanted[]>([]);
-  const [hotWanted, setHotWanted] = useState<Wanted[]>([]);
   const [games, setGames] = useState<Game[]>([]);
 
   const pagination = {
     clickable: true,
     renderBullet: function (index: number, className: any) {
-      return '<span class="' + className + '">' + pageName[index] + '</span>';
+      return '<div class="' + className + '">' + pageName[index] + '</div>';
     },
   };
 
   useEffect(() => {
     (async () => {
-      // HACK:非同期で取ったほうがいいかも
-      // Potが大きいWanted取得 limit number 
-      const topWanted = await getTopWanted(9);
-      const newWanted = await getNewWanted(2);
-      const hotWanted = await getHotWanted(5);
-      setTopWanted(topWanted);
-      setNewWanted(newWanted);
-      setHotWanted(hotWanted);
-
       // Games List
       const gameList = await getAllActiveGames();
-      // HACK: sortは、Fetchのタイミングでsortかけたほうが早い場合はリファクタ
-      const sortedGames = await gameList.sort((a, b) => a.maxPod - b.maxPod);
-      setGames(sortedGames);
+      setGames(gameList.sort((a, b) => a.topAmount - b.topAmount));
     })();
   }, []);
 
   return (
-    <div>
+    <SwiperContainer>
       <Swiper
         pagination={pagination}
         modules={[Pagination]}
       >
         <SwiperSlide>
-          <HotPotSlide 
-            topWanted = {topWanted}
-            newWanted = {newWanted}
-            hotWanted = {hotWanted}/>
+          <HotPotSlide games = {games}/>
         </SwiperSlide>
         <SwiperSlide>
           <LegendSlide pageName = "Legend slide"></LegendSlide>
         </SwiperSlide>
         <SwiperSlide>
-          <AllGamesSlide games = {games}></AllGamesSlide>
-        </SwiperSlide>
-        <SwiperSlide>
-          <ShopSlide pageName = "shop slide"></ShopSlide>
+          <ShopSlide pageName = "user slide"></ShopSlide>
         </SwiperSlide>
       </Swiper>
-    </div>
+    </SwiperContainer>
   );
 };
+
+const SwiperContainer = styled.div`
+    width: 100%;
+    height: 100%; 
+`;
