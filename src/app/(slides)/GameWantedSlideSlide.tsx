@@ -15,11 +15,6 @@ const GameWantedSlide: React.FC<props> = ({ games }) => {
 
     return (
         <Background>
-            <RecommendTagArea>
-                <RecommendTag isActive={true} >Reward</RecommendTag>
-                <RecommendTag isActive={false} >Hot Ranking</RecommendTag>
-                <RecommendTag isActive={false} >New Listing</RecommendTag>
-            </RecommendTagArea>
             <Game>
                 <center>
                     {games.map((game, i) => (
@@ -56,19 +51,6 @@ const WantedPosterArea = styled.div`
 const Background = styled.div`
     width: 100%;
     height: 100%;
-    background-image: url(/static/images/background/background1.png);
+    background-image: url(/static/images/background/background_black.png);
     background-size: cover;
-`;
-
-const RecommendTagArea = styled.div`
-    position: relative;
-    top: 120px;
-`;
-
-const RecommendTag = styled.div<{ isActive: boolean }>`
-    margin-left: 10px;
-    margin-right: 10px;
-    display: inline-block;
-    color: #FFFFFF;
-    ${(props) => props.isActive && `border-bottom: 5px solid #FFFFFF`};
 `;

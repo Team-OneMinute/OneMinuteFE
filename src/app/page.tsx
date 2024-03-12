@@ -16,10 +16,10 @@ import { getAllActiveGames } from "./service/game";
 // slides
 import HotPotSlide from './(slides)/GameWantedSlideSlide';
 import LegendSlide from './(slides)/LegendSlide';
-import AllGamesSlide from './(slides)/AllGamesSlide';
+import AllGamesSlide from './(slides)/GamesSlide1';
 import ShopSlide from './(slides)/UserSlide';
 
-const pageName = ["Game", "Legend", "User"];
+const pageName = ["ALL GAME", "Legend", "User"];
 
 export default function App() {
   const [games, setGames] = useState<Game[]>([]);

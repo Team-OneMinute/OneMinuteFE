@@ -8,7 +8,7 @@ interface props {
     games: Game[];
 }
 
-const AllGamesSlide: React.FC<props> = ({ games }) => {
+const GamesSlide: React.FC<props> = ({ games }) => {
     const gameDetailPath = (id: string) =>{
         const defaultGameDetailPath = "/gameDetail";
         const delimiter = "?";
@@ -22,13 +22,13 @@ const AllGamesSlide: React.FC<props> = ({ games }) => {
             <NavigateButton>User</NavigateButton>
             <GameCardArea>
                 {games.map((game) => (
-                    <div key={game.id}>
+                    <div key={game.gameId}>
                         <GameCard
-                            gameImage={game.imageUrl}
-                            thumbnail={game.thumbnailUrl}
-                            title={game.title}
-                            navigateTo={gameDetailPath(game.id)}
-                            earn={game.maxPod}
+                            gameImage={game.gameImageUrl}
+                            thumbnail={game.gameThumbnailUrl}
+                            title={game.gameTitle}
+                            navigateTo={gameDetailPath(game.gameId)}
+                            earn={game.topAmount}
                         />
                     </div>
                 ))}
@@ -36,7 +36,7 @@ const AllGamesSlide: React.FC<props> = ({ games }) => {
         </Background>
     );
   };
-export default AllGamesSlide;
+export default GamesSlide;
 
 const Background = styled.div`
     width: 100%;
