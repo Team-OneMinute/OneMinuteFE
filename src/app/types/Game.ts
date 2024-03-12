@@ -1,9 +1,10 @@
 type Game = {
-    id: string;
-    title: string;
-    imageUrl: string;
-    maxPod: number;
+    gameId: string;
+    gameTitle: string;
+    gameImageUrl: string;
+    gameThumbnailUrl: string;
+    topAmount: number;
     topUserId: string;
-    is_open: boolean;
+    isOpen: boolean;
     start: Date;
   };

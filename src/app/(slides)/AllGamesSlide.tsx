@@ -10,19 +10,22 @@ interface props {
 
 const AllGamesSlide: React.FC<props> = ({ games }) => {
     const gameDetailPath = (id: string) =>{
-        const defaltGameDetailPath = "/gameDetail";
+        const defaultGameDetailPath = "/gameDetail";
         const delimiter = "?";
         const param = "id="
-        return defaltGameDetailPath + delimiter + param + id;
+        return defaultGameDetailPath + delimiter + param + id;
       };
     
     return (
         <Background>
+            <NavigateButton>Recommend</NavigateButton>
+            <NavigateButton>User</NavigateButton>
             <GameCardArea>
                 {games.map((game) => (
                     <div key={game.id}>
                         <GameCard
-                            url={game.imageUrl}
+                            gameImage={game.imageUrl}
+                            thumbnail={game.thumbnailUrl}
                             title={game.title}
                             navigateTo={gameDetailPath(game.id)}
                             earn={game.maxPod}
@@ -38,8 +41,21 @@ export default AllGamesSlide;
 const Background = styled.div`
     width: 100%;
     height: 100%;
-    background-image: url(/static/images/background/background3.png);
-    background-size:100% auto;
+    background-image: url(/static/images/background/background1.png);
+    background-size: cover;
+`;
+
+const NavigateButton = styled.button`
+    width: 90px;
+    height: 35px;
+    margin: 40px;
+    border: 2px solid #FFF;
+    border-radius: 20px;
+    text-align: center;
+    line-height: 20px;
+    font-size: 14px;
+    color: #fff;
+    background: transparent;
 `;
 
 const GameCardArea = styled.div`
