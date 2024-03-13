@@ -10,11 +10,13 @@ interface position {
 
 interface props {
     games: Game[];
+    rankings: Score[];
+    pools: Pool[];
     selectedGameId: string | null;
     setSelectedGameId: (gameId: string) => void;
 }
 
-const AllGameSlide: React.FC<props> = ({ games, selectedGameId, setSelectedGameId }) => {
+const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId, setSelectedGameId }) => {
     console.log("selectedGameId: " + selectedGameId);
     const positionSet = [
         {x: 20, y: 20},
@@ -47,6 +49,48 @@ const AllGameSlide: React.FC<props> = ({ games, selectedGameId, setSelectedGameI
         }
     };
 
+    const rankingOrder = () => {
+        const poolSize = pools.length;
+        const rankingSize = rankings.length;
+        return `${poolSize} ${rankingSize}`;
+    };
+
+    const maxReward = () => {
+        return pools.length? pools[0].potAmount :0;
+    };
+
+    const rankingSummary = () => {
+        //const poolSize = pools.length;
+        const poolSize = pools.length;
+        if(poolSize === 0) return "a";
+        console.log(pools.length);
+
+        const firstRange = 0.1;
+        const secondRange = 0.2;
+        
+        const firstRangeSize = Math.ceil(poolSize * firstRange);
+        const secondRangeSize = Math.ceil(poolSize * secondRange);
+        const thirdRangeSize = poolSize - firstRangeSize - secondRangeSize;
+
+        const firstRangeTopRank = 1;
+        const firstRangeUnderRank =  firstRangeTopRank + firstRangeSize -1;
+        const secondRangeTopRank = firstRangeUnderRank + 1;
+        const secondRangeUnderRank = secondRangeTopRank + secondRangeSize -1;
+        const thirdRangeTopRank = secondRangeUnderRank + 1;
+        const thirdRangeUnderRank = thirdRangeTopRank + thirdRangeSize -1;
+
+        const firstRangeTopAmount = pools[firstRangeTopRank-1].potAmount;
+        const firstRangeUnderAmount =  pools[firstRangeUnderRank-1].potAmount;
+        const secondRangeTopAmount = pools[secondRangeTopRank-1].potAmount;
+        const secondRangeUnderAmount = pools[secondRangeUnderRank-1].potAmount;
+        const thirdRangeTopAmount = pools[thirdRangeTopRank-1].potAmount;
+        const thirdRangeUnderAmount = pools[thirdRangeUnderRank-1].potAmount;
+        
+        return `${firstRangeTopRank} ~ ${firstRangeUnderRank} : ${firstRangeTopAmount} ~ ${firstRangeUnderAmount}
+                ${secondRangeTopRank} ~ ${secondRangeUnderRank} : ${secondRangeTopAmount} ~ ${secondRangeUnderAmount}
+                ${thirdRangeTopRank} ~ ${thirdRangeUnderRank} : ${thirdRangeTopAmount} ~ ${thirdRangeUnderAmount}`;
+    };
+
     return (
         <Background>
             <GameFieldArea>
@@ -54,7 +98,9 @@ const AllGameSlide: React.FC<props> = ({ games, selectedGameId, setSelectedGameI
                 {getGameTargetDiv(games)}
             </GameFieldArea>
             <DetailArea>
-                <div></div>
+                <RankingNumberInfo>Ranking uu {rankingOrder()}</RankingNumberInfo>
+                <RewardInfo>Max Reward {maxReward()}</RewardInfo>
+                <RankingSummaryInfo>Ranking num {rankingSummary()}</RankingSummaryInfo>
             </DetailArea>
         </Background>
     );
@@ -98,16 +144,26 @@ const SymbolNftImage = styled.img`
 `;
 
 const DetailArea = styled.div`
+    position: relative;
+    top: ${USER_AREA_HEIGht + NAVIGATION_AREA_HEIGHT}px;
+    width: 100%;
+    height: 100px;
 `;
 
-const MaxRewardDiv = styled.div`
+const RankingNumberInfo = styled.div`
+    width: 100%;
+    height: 30px;
+    color: #FFF;
 `;
 
-const RankingRangeDiv = styled.div`
+const RewardInfo = styled.div`
+    width: 100%;
+    height: 30px;
+    color: #FFF;
 `;
 
-const RecentlyUpdateCountDiv = styled.div`
-`;
-
-const RankingSummaryDiv = styled.div`
+const RankingSummaryInfo = styled.div`
+    width: 100%;
+    height: 30px;
+    color: #FFF;
 `;

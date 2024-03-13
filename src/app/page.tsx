@@ -13,6 +13,7 @@ import './styles.css';
 // components
 import { getTopWanted, getNewWanted, getHotWanted } from "./service/wanted";
 import { getAllActiveGames } from "./service/game";
+import { getPools } from "./service/pool";
 
 // slides
 import HotPotSlide from './(slides)/GameWantedSlideSlide';
@@ -20,38 +21,51 @@ import LegendSlide from './(slides)/LegendSlide';
 import AllGamesSlide from './(slides)/AllGameSlide';
 import GameGenreSlide from './(slides)/GameGenreSlide';
 import ShopSlide from './(slides)/UserSlide';
-import { getGameRanking } from './service/ranking';
+import { getGameScore } from './service/score';
 
 const pageName = ["ALL", "ACTION", "BATTLE", "SHOOTING", "PUZZLE"];
 
 export default function App() {
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
+  const [rankings, setRankings] = useState<Score[]>([]);
+  const [pools, setPools] = useState<Pool[]>([]);
 
   const pagination = {
     clickable: true,
     renderBullet: function (index: number, className: any) {
-      return '<div class="' + className + '">' + pageName[index] + '</div>';
+      return `<div class="${className}"> ${pageName[index]} </div>`;
     },
   };
 
   useEffect(() => {
     (async () => {
-      // Games List
+      // fetch from database
       const gameList = await getAllActiveGames();
-      setGames(gameList.sort((a, b) => a.topAmount - b.topAmount));
+      const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount)
+      await setGames(sortedGameList);
       if (games.length > 0) {
         setSelectedGameId(games[0].gameId);
-      }
+      };
+
     })();
   }, []);
 
   useEffect(() => {
-    console.log("useEffect");
+      if (games.length > 0) {
+        setSelectedGameId(games[0].gameId);
+      };
+  }, [games]);
+
+  useEffect(() => {
     (async () => {
+      // TODO: second fetch, add data in STORE
       if (selectedGameId) {
-        const ranking = await getGameRanking(selectedGameId);
-        // TODO: ranking sort
+        const poolList = await getPools(selectedGameId);
+        const rankingList = await getGameScore(selectedGameId);
+        setRankings(rankingList.sort((a, b) => a.score - b.score));
+
+        setPools(poolList); // already sorted by top amount
       }
     })();
   }, [selectedGameId]);
@@ -69,6 +83,8 @@ export default function App() {
         <SwiperSlide>
           <AllGamesSlide
             games={games}
+            rankings={rankings}
+            pools={pools}
             selectedGameId={selectedGameId}
             setSelectedGameId={setSelectedGameId}
           />
