@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect } from 'react';
+import { useRouter } from "next/navigation";
 import styled from "styled-components";
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '../styles';
 
@@ -17,6 +18,7 @@ interface props {
 }
 
 const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId, setSelectedGameId }) => {
+    const router = useRouter();
     console.log("selectedGameId: " + selectedGameId);
     const positionSet = [
         {x: 20, y: 20},
@@ -67,7 +69,7 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
 
         const firstRange = 0.1;
         const secondRange = 0.2;
-        
+
         const firstRangeSize = Math.ceil(poolSize * firstRange);
         const secondRangeSize = Math.ceil(poolSize * secondRange);
         const thirdRangeSize = poolSize - firstRangeSize - secondRangeSize;
@@ -85,7 +87,7 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
         const secondRangeUnderAmount = pools[secondRangeUnderRank-1].potAmount;
         const thirdRangeTopAmount = pools[thirdRangeTopRank-1].potAmount;
         const thirdRangeUnderAmount = pools[thirdRangeUnderRank-1].potAmount;
-        
+
         return `${firstRangeTopRank} ~ ${firstRangeUnderRank} : ${firstRangeTopAmount} ~ ${firstRangeUnderAmount}
                 ${secondRangeTopRank} ~ ${secondRangeUnderRank} : ${secondRangeTopAmount} ~ ${secondRangeUnderAmount}
                 ${thirdRangeTopRank} ~ ${thirdRangeUnderRank} : ${thirdRangeTopAmount} ~ ${thirdRangeUnderAmount}`;
@@ -101,6 +103,7 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
                 <RankingNumberInfo>Ranking uu {rankingOrder()}</RankingNumberInfo>
                 <RewardInfo>Max Reward {maxReward()}</RewardInfo>
                 <RankingSummaryInfo>Ranking num {rankingSummary()}</RankingSummaryInfo>
+                <DetailButton onClick={() => router.push(`/gameDetail?id=${selectedGameId}`)}>Detail</DetailButton>
             </DetailArea>
         </Background>
     );
@@ -163,6 +166,12 @@ const RewardInfo = styled.div`
 `;
 
 const RankingSummaryInfo = styled.div`
+    width: 100%;
+    height: 80px;
+    color: #FFF;
+`;
+
+const DetailButton = styled.div`
     width: 100%;
     height: 30px;
     color: #FFF;
