@@ -4,41 +4,34 @@ import { useRouter } from "next/navigation";
 import styled from "styled-components";
 
 interface props {
-    games: Game[];
+    game: Game;
     rankings: Score[];
     pools: Pool[];
     closeDetailModal: () => void;
     selectedGameId: string | null;
 }
 
-const GameDetailModal: React.FC<props> = ({ games, rankings, pools, closeDetailModal, selectedGameId }) => {
+const GameDetailModal: React.FC<props> = ({ game, rankings, pools, closeDetailModal, selectedGameId }) => {
   const router = useRouter();
-  if (selectedGameId === null || pools.length === 0) {
+  if (!selectedGameId || pools.length == 0) {
     return;
   }
-  console.log(games);
+  console.log(game);
   return (
-    <DetailModalArea>
-      <Overlay onClick={(e) => e.target === e.currentTarget && closeDetailModal()}>
-        <Content>
-          <SubTitle>Game About</SubTitle>
-          <GameDetail>{games[0].gameDetail}</GameDetail>
-          <SubTitle>Reward</SubTitle>
-          <RewardDetail>{pools[0].potAmount}</RewardDetail>
-          <PlayButtonArea>
-            <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Free Play</PlayButton>
-            <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Play</PlayButton>  
-          </PlayButtonArea>
-        </Content>
-      </Overlay>
-    </DetailModalArea>
+    <Overlay onClick={(e) => e.target === e.currentTarget && closeDetailModal()}>
+      <Content>
+        <SubTitle>Game About</SubTitle>
+        <GameDetail>{game.gameDetail}</GameDetail>
+        <SubTitle>Reward</SubTitle>
+        <RewardDetail>{pools[0].potAmount}</RewardDetail>
+        <PlayButtonArea>
+          <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Free Play</PlayButton>
+          <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Play</PlayButton>
+        </PlayButtonArea>
+      </Content>
+    </Overlay>
   );
 };
-
-const DetailModalArea = styled.div`
-  width: 100%;
-  height: 100px;
-`;
 
 const SubTitle = styled.div`
   color: #000,

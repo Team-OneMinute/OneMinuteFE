@@ -1,5 +1,5 @@
 "use client"
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from "styled-components";
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht, USER_AREA_MARGIN, USER_NFT_IMAGE_SIZE } from './styles';
 
@@ -22,14 +22,16 @@ import AllGamesSlide from './(slides)/AllGameSlide';
 import GameGenreSlide from './(slides)/GameGenreSlide';
 import ShopSlide from './(slides)/UserSlide';
 import { getGameScore } from './service/score';
+import GameDetailModal from './component/GameDetailModal';
 
 const pageName = ["ALL", "ACTION", "BATTLE", "SHOOTING", "PUZZLE"];
 
 export default function App() {
   const [games, setGames] = useState<Game[]>([]);
-  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [rankings, setRankings] = useState<Score[]>([]);
   const [pools, setPools] = useState<Pool[]>([]);
+  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
+  const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
 
   const pagination = {
     clickable: true,
@@ -37,6 +39,10 @@ export default function App() {
       return `<div class="${className}"> ${pageName[index]} </div>`;
     },
   };
+
+  const closeDetailModal = useCallback(() => {
+    setIsOpenDetailModal(false);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -71,38 +77,50 @@ export default function App() {
   }, [selectedGameId]);
 
   return (
-    <SwiperContainer>
-      <UserArea>
-          <UserNftImg src='/static/images/temp/tmpUser.png' />
-          <UserTotalAmount>$1000</UserTotalAmount>
-      </UserArea>
-      <Swiper
-        pagination={pagination}
-        modules={[Pagination]}
-      >
-        <SwiperSlide>
-          <AllGamesSlide
-            games={games}
-            rankings={rankings}
-            pools={pools}
-            selectedGameId={selectedGameId}
-            setSelectedGameId={setSelectedGameId}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <GameGenreSlide pageName = "Action Slide" />
-        </SwiperSlide>
-        <SwiperSlide>
-          <GameGenreSlide pageName = "Battle Slide" />
-        </SwiperSlide>
-        <SwiperSlide>
-          <GameGenreSlide pageName = "Shooting Slide" />
-        </SwiperSlide>
-        <SwiperSlide>
-          <GameGenreSlide pageName = "Puzzle Slide" />
-        </SwiperSlide>
-      </Swiper>
-    </SwiperContainer>
+    <>
+      <SwiperContainer>
+        <UserArea>
+            <UserNftImg src='/static/images/temp/tmpUser.png' />
+            <UserTotalAmount>$1000</UserTotalAmount>
+        </UserArea>
+        <Swiper
+          pagination={pagination}
+          modules={[Pagination]}
+        >
+          <SwiperSlide>
+            <AllGamesSlide
+              games={games}
+              rankings={rankings}
+              pools={pools}
+              selectedGameId={selectedGameId}
+              setSelectedGameId={setSelectedGameId}
+              setIsOpenDetailModal={setIsOpenDetailModal}
+            />
+          </SwiperSlide>
+          <SwiperSlide>
+            <GameGenreSlide pageName = "Action Slide" />
+          </SwiperSlide>
+          <SwiperSlide>
+            <GameGenreSlide pageName = "Battle Slide" />
+          </SwiperSlide>
+          <SwiperSlide>
+            <GameGenreSlide pageName = "Shooting Slide" />
+          </SwiperSlide>
+          <SwiperSlide>
+            <GameGenreSlide pageName = "Puzzle Slide" />
+          </SwiperSlide>
+        </Swiper>
+      </SwiperContainer>
+      {isOpenDetailModal &&
+        <GameDetailModal
+          game={games.find(game => game.gameId == selectedGameId) || games[0]}
+          rankings={rankings}
+          pools={pools}
+          closeDetailModal={closeDetailModal}
+          selectedGameId={selectedGameId}
+        />
+      }
+    </>
   );
 };
 

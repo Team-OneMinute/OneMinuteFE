@@ -1,6 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useState } from 'react';
-import { useRouter } from "next/navigation";
+import React from 'react';
 import styled from "styled-components";
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '../styles';
 
@@ -18,12 +17,10 @@ interface props {
     pools: Pool[];
     selectedGameId: string | null;
     setSelectedGameId: (gameId: string) => void;
+    setIsOpenDetailModal: (isOpen: boolean) => void;
 }
 
-const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId, setSelectedGameId }) => {
-    const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
-    
-    const router = useRouter();
+const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId, setSelectedGameId, setIsOpenDetailModal }) => {
     console.log("selectedGameId: " + selectedGameId);
     const positionSet = [
         {x: 20, y: 20},
@@ -31,10 +28,6 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
         {x: 20, y: 80},
         {x: 80, y: 20},
     ];
-
-    const closeDetailModal = useCallback(() => {
-        setIsOpenDetailModal(false);
-      }, []);
 
     const isActive = (gameId: string) => {
         return gameId == selectedGameId;
@@ -113,13 +106,6 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
                 <RewardInfo>Max Reward {maxReward()}</RewardInfo>
                 <RankingSummaryInfo>Ranking num {rankingSummary()}</RankingSummaryInfo>
                 <DetailButton onClick={() => setIsOpenDetailModal(true)}>Detail</DetailButton>
-                {isOpenDetailModal
-                && <GameDetailModal 
-                    games={games}
-                    rankings={rankings}
-                    pools={pools}
-                    closeDetailModal={closeDetailModal}
-                    selectedGameId={selectedGameId}/>}                  
             </DetailArea>
         </Background>
     );
@@ -192,9 +178,4 @@ const DetailButton = styled.div`
     width: 100%;
     height: 30px;
     color: #FFF;
-`;
-
-const DetailModalArea = styled.div`
-    width: 100%;
-    height: 100%;
 `;
