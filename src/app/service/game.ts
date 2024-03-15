@@ -19,6 +19,7 @@ export const getAllActiveGames = async () =>{
       return {
         gameId: String(data.id),
         gameTitle: String(data.title),
+        gameDetail: String(data.game_detail),
         gameImageUrl: String(data.game_image_url),
         gameThumbnailUrl: String(data.thumbnail_url),
         topAmount: Number(data.max_pot),

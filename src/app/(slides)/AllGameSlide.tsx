@@ -1,8 +1,11 @@
 "use client"
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '../styles';
+
+// components
+import GameDetailModal from "../component/GameDetailModal";
 
 interface position {
     x: number;
@@ -18,6 +21,8 @@ interface props {
 }
 
 const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId, setSelectedGameId }) => {
+    const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
+    
     const router = useRouter();
     console.log("selectedGameId: " + selectedGameId);
     const positionSet = [
@@ -26,6 +31,10 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
         {x: 20, y: 80},
         {x: 80, y: 20},
     ];
+
+    const closeDetailModal = useCallback(() => {
+        setIsOpenDetailModal(false);
+      }, []);
 
     const isActive = (gameId: string) => {
         return gameId == selectedGameId;
@@ -103,7 +112,14 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
                 <RankingNumberInfo>Ranking uu {rankingOrder()}</RankingNumberInfo>
                 <RewardInfo>Max Reward {maxReward()}</RewardInfo>
                 <RankingSummaryInfo>Ranking num {rankingSummary()}</RankingSummaryInfo>
-                <DetailButton onClick={() => router.push(`/gameDetail?id=${selectedGameId}`)}>Detail</DetailButton>
+                <DetailButton onClick={() => setIsOpenDetailModal(true)}>Detail</DetailButton>
+                {isOpenDetailModal
+                && <GameDetailModal 
+                    games={games}
+                    rankings={rankings}
+                    pools={pools}
+                    closeDetailModal={closeDetailModal}
+                    selectedGameId={selectedGameId}/>}                  
             </DetailArea>
         </Background>
     );
@@ -150,7 +166,8 @@ const DetailArea = styled.div`
     position: relative;
     top: ${USER_AREA_HEIGht + NAVIGATION_AREA_HEIGHT}px;
     width: 100%;
-    height: 100px;
+    height: 100%;
+    margin: 16px 4px;
 `;
 
 const RankingNumberInfo = styled.div`
@@ -175,4 +192,9 @@ const DetailButton = styled.div`
     width: 100%;
     height: 30px;
     color: #FFF;
+`;
+
+const DetailModalArea = styled.div`
+    width: 100%;
+    height: 100%;
 `;
