@@ -12,8 +12,11 @@ import './styles.css';
 
 // components
 import { getTopWanted, getNewWanted, getHotWanted } from "./service/wanted";
+
+// services
 import { getAllActiveGames } from "./service/game";
 import { getPools } from "./service/pool";
+import { getUser } from "./service/user";
 
 // slides
 import HotPotSlide from './(slides)/GameWantedSlideSlide';
@@ -30,8 +33,12 @@ export default function App() {
   const [games, setGames] = useState<Game[]>([]);
   const [rankings, setRankings] = useState<Score[]>([]);
   const [pools, setPools] = useState<Pool[]>([]);
+  const [user, setUser] = useState<User[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
+
+  // ユーザ認証ができるまで、userId固定
+  const userId = "0001A";
 
   const pagination = {
     clickable: true,
@@ -48,12 +55,15 @@ export default function App() {
     (async () => {
       // fetch from database
       const gameList = await getAllActiveGames();
+      const userData = await getUser(userId);
+
       const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount)
       await setGames(sortedGameList);
       if (games.length > 0) {
         setSelectedGameId(games[0].gameId);
       };
-
+      
+      await setUser(userData);
     })();
   }, []);
 
@@ -116,6 +126,7 @@ export default function App() {
           game={games.find(game => game.gameId == selectedGameId) || games[0]}
           rankings={rankings}
           pools={pools}
+          user={user[0]}
           closeDetailModal={closeDetailModal}
           selectedGameId={selectedGameId}
         />

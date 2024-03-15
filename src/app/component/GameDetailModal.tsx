@@ -3,20 +3,37 @@ import React from 'react';
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
 
+// services
+import { decrementLife } from "../service/user";
+import { setTransaction } from "../service/gameTransaction";
+
+// components
+import { CountDownMovie } from "../component/countdownMovie";
+
 interface props {
     game: Game;
     rankings: Score[];
     pools: Pool[];
+    user: User;
     closeDetailModal: () => void;
     selectedGameId: string | null;
 }
 
-const GameDetailModal: React.FC<props> = ({ game, rankings, pools, closeDetailModal, selectedGameId }) => {
+const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDetailModal, selectedGameId }) => {
   const router = useRouter();
   if (!selectedGameId || pools.length == 0) {
     return;
   }
-  console.log(game);
+
+  const clickPlay = async () => {
+    console.log(user.docNo);
+    // decrement user life -1
+    await decrementLife(user.docNo);
+    // add gameTransaction
+    await setTransaction(selectedGameId, user.userId);
+    router.push(`/play?id=${selectedGameId}`);
+  }
+
   return (
     <Overlay onClick={(e) => e.target === e.currentTarget && closeDetailModal()}>
       <Content>
@@ -24,9 +41,12 @@ const GameDetailModal: React.FC<props> = ({ game, rankings, pools, closeDetailMo
         <GameDetail>{game.gameDetail}</GameDetail>
         <SubTitle>Reward</SubTitle>
         <RewardDetail>{pools[0].potAmount}</RewardDetail>
+        <SubTitle>Life</SubTitle>
+        <UserLife>❤️✖︎{user.life} → ❤️✖︎{user.life - 1}</UserLife>
         <PlayButtonArea>
           <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Free Play</PlayButton>
-          <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Play</PlayButton>
+          <PlayButton onClick={() => clickPlay()}>Play</PlayButton>
+          <PlayButton onClick={() => CountDownMovie()}>countdown</PlayButton>
         </PlayButtonArea>
       </Content>
     </Overlay>
@@ -83,6 +103,10 @@ const Content = styled.div`
     transform: translate(-50%, -50%);
     min-width: 80vmin;
     z-index: 11;
+`;
+
+const UserLife = styled.div`
+  
 `;
 
 const PlayButtonArea = styled.div`
