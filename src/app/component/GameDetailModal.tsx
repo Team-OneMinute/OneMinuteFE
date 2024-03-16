@@ -14,14 +14,14 @@ interface props {
     game: Game;
     rankings: Score[];
     pools: Pool[];
-    user: User;
+    user: User | null;
     closeDetailModal: () => void;
     selectedGameId: string | null;
 }
 
 const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDetailModal, selectedGameId }) => {
   const router = useRouter();
-  if (!selectedGameId || pools.length == 0) {
+  if (!selectedGameId || pools.length == 0 || !user) {
     return;
   }
 

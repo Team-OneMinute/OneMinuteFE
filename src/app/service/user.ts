@@ -24,7 +24,7 @@ export const getUser = async (userId: string) =>{
       } as User;
     });
 
-    return user;
+    return user[0];
 };
 
 export const decrementLife = async (docNo: string) => {
@@ -34,6 +34,16 @@ export const decrementLife = async (docNo: string) => {
     userRef, 
     {
       life: increment(-1)
+    });
+}
+
+export const addClaimableReward = async (docNo: string, amount: number) => {
+  const db = initialize();
+  const userRef = doc(db, "users", docNo);
+  await updateDoc(
+    userRef, 
+    {
+      claimable_reward: increment(amount)
     });
 }
 

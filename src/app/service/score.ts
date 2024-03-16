@@ -1,17 +1,31 @@
 // firebase
-import { collection, getDocs } from 'firebase/firestore';
+import { DocumentData, QuerySnapshot, collection, doc, getDocs, orderBy, query, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { fireStoreInitialized } from "../infrastructure/firebase/firestore";
 
-export const getGameScore = async (gameId: string) => {
+export const getGameScoreForSnapOrderScore = async (gameId: string) => {
     const db = initialize();
 
-    const scoreCollection = collection(db, `${gameId}_score`);
-    const scoreDocs = await getDocs(scoreCollection);
+    const scoreRef = collection(db, `${gameId}_score`);
+    const fetchScoreDescQuery = query(scoreRef, orderBy("score", "desc"));
+    const scoreSnap = await getDocs(fetchScoreDescQuery);
 
-    // HACK: sortは、Fetchのタイミングでsortかけたほうが早い場合はリファクタ
-    const scoreData = scoreDocs.docs.map(doc => doc.data());
+    return scoreSnap;
+};
 
-    const score = scoreData.map(data => {
+export const getGameScoreForObj = async (gameId: string) => {
+    const db = initialize();
+
+    const scoreRef = collection(db, `${gameId}_score`);
+    const fetchScoreDescQuery = query(scoreRef, orderBy("score", "desc"));
+    const scoreSnap = await getDocs(fetchScoreDescQuery);
+
+    return transferScoreObj(scoreSnap);
+};
+
+export const transferScoreObj = (snapShot: QuerySnapshot<DocumentData, DocumentData>) => {
+    const scoreData = snapShot.docs.map(doc => doc.data());
+
+    const scoreObj = scoreData.map(data => {
         return {
           score: Number(data.score),
           userId: String(data.user_id),
@@ -20,12 +34,32 @@ export const getGameScore = async (gameId: string) => {
           finalUpdateDate: data.final_update_date,
         } as Score;
     });
+    return scoreObj;
+}
 
-    return score;
+export const addScoreDocument = async (gameId: string, userId: string, score: number) => {
+    const db = initialize();
+    const scoreRef = collection(db, `${gameId}_score`);
+    const newScoreRef = doc(scoreRef);
+    await setDoc(newScoreRef,
+        {
+            user_id: userId,
+            score: score,
+            play_count: 1,
+            create_date: serverTimestamp(),
+            final_update_date: serverTimestamp(),
+      });
 };
 
-const sortRanking = (scoreList: Score[]) => {
-
+export const updateScoreDocByDocNo = async (gameId:string, docNo:string, newScore: number) => {
+    const db = initialize();
+    const updateScoreRef = doc(db, `${gameId}_score`, docNo);
+    await updateDoc(
+        updateScoreRef, 
+        {
+          score: newScore,
+          final_update_date: serverTimestamp(),
+        });
 };
 
 const initialize = () => {

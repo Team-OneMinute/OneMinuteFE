@@ -15,7 +15,7 @@ import { getTopWanted, getNewWanted, getHotWanted } from "./service/wanted";
 
 // services
 import { getAllActiveGames } from "./service/game";
-import { getPools } from "./service/pool";
+import { getPoolsForObj } from "./service/pool";
 import { getUser } from "./service/user";
 
 // slides
@@ -24,7 +24,7 @@ import LegendSlide from './(slides)/LegendSlide';
 import AllGamesSlide from './(slides)/AllGameSlide';
 import GameGenreSlide from './(slides)/GameGenreSlide';
 import ShopSlide from './(slides)/UserSlide';
-import { getGameScore } from './service/score';
+import { getGameScoreForObj } from './service/score';
 import GameDetailModal from './component/GameDetailModal';
 
 const pageName = ["ALL", "ACTION", "BATTLE", "SHOOTING", "PUZZLE"];
@@ -33,7 +33,7 @@ export default function App() {
   const [games, setGames] = useState<Game[]>([]);
   const [rankings, setRankings] = useState<Score[]>([]);
   const [pools, setPools] = useState<Pool[]>([]);
-  const [user, setUser] = useState<User[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
 
@@ -77,8 +77,8 @@ export default function App() {
     (async () => {
       // TODO: second fetch, add data in STORE
       if (selectedGameId) {
-        const poolList = await getPools(selectedGameId);
-        const rankingList = await getGameScore(selectedGameId);
+        const poolList = await getPoolsForObj(selectedGameId);
+        const rankingList = await getGameScoreForObj(selectedGameId);
         setRankings(rankingList.sort((a, b) => a.score - b.score));
 
         setPools(poolList); // already sorted by top amount
@@ -126,7 +126,7 @@ export default function App() {
           game={games.find(game => game.gameId == selectedGameId) || games[0]}
           rankings={rankings}
           pools={pools}
-          user={user[0]}
+          user={user}
           closeDetailModal={closeDetailModal}
           selectedGameId={selectedGameId}
         />
