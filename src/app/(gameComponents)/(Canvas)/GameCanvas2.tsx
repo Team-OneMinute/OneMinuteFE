@@ -9,9 +9,10 @@ const jumpPower = -7; // ジャンプ力
 
 interface Props {
   backAction: () => void;
+  updateRanking: (score: number) => void;
 }
 
-const GameCanvas2: React.FC<Props> = ({ backAction }) => {
+const GameCanvas2: React.FC<Props> = ({ backAction, updateRanking }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const didLogRef = useRef<boolean>(false);
   const [tryCount, setTryCount] = useState<number>(1);
@@ -80,6 +81,9 @@ const GameCanvas2: React.FC<Props> = ({ backAction }) => {
 
             // result board draw
             resultBoard.draw(tryCount);
+
+            // upsert ranking
+            updateRanking(score);
 
             return;
           }

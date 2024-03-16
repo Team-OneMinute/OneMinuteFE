@@ -8,7 +8,7 @@ import { decrementLife } from "../service/user";
 import { setTransaction } from "../service/gameTransaction";
 
 // components
-import { CountDownMovie } from "../component/countdownMovie";
+// import { CountDownMovie } from "../component/countdownMovie";
 
 interface props {
     game: Game;
@@ -46,7 +46,6 @@ const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDe
         <PlayButtonArea>
           <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Free Play</PlayButton>
           <PlayButton onClick={() => clickPlay()}>Play</PlayButton>
-          <PlayButton onClick={() => CountDownMovie()}>countdown</PlayButton>
         </PlayButtonArea>
       </Content>
     </Overlay>
