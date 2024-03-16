@@ -20,6 +20,7 @@ export const upsertRanking = async (gameId: string, score: number, user: User) =
     //const newScore = score;
     const newScore = 9981;
 
+    // fetch score data
     const scoreSnap = await getGameScoreForSnapOrderScore(gameId);
     const scoreFetchData = transferScoreObj(scoreSnap);
 
@@ -35,10 +36,10 @@ export const upsertRanking = async (gameId: string, score: number, user: User) =
     } else if (isWinOwnScore(scoreFetchData, beforeRankingNo, newScore)) {
         console.log("Update score already played user");
         // TODO: fail safe. This should score is unique now but what happens err.
+        // FIXME:同点のスコアを取ると、名前順で下の判定をされてしまい、後続のらプール対象になる
         const updateDocNo = scoreSnap.docs[beforeRankingNo - 1].id;
         updateScoreDocByDocNo(gameId, updateDocNo, newScore);
     } else {
-        // don't update ranking
         console.log("don't update ranking");
         return;
     }
@@ -52,7 +53,8 @@ export const upsertRanking = async (gameId: string, score: number, user: User) =
 
     // update pool & user reward
     const poolSnap = await getPoolsForSnap(gameId);
-    if (isSuccessUpdatingRanking(getPoolSize(poolSnap), afterRankingNo)){
+
+    if (isEligibleForRankingReward(getPoolSize(poolSnap), afterRankingNo)){
         console.log("get pool");
         // const updateDocNo = poolSnap.docs[beforeRankingNo - 1].id;
         // const poolObject = transferPoolObj(poolSnap);
@@ -73,7 +75,7 @@ const isWinOwnScore = (_scoreFetchData: DocumentData[],_beforeRankingNo: number,
     return _scoreFetchData[_beforeRankingNo - 1].score < _score;
 };
 
-const isSuccessUpdatingRanking = (rankingSize: number, rankingNo: number) => {
+const isEligibleForRankingReward = (rankingSize: number, rankingNo: number) => {
     return rankingSize >= rankingNo;
 };
 
