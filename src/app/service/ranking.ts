@@ -1,85 +1,77 @@
 // services
-import { getGameScoreForSnapOrderScore, transferScoreObj, addScoreDocument, updateScoreDocByDocNo } from '../service/score';
-import { getPoolsForSnap, getPoolSize, updatePoolsByDocNo, transferPoolObj } from '../service/pool';
-import { addClaimableReward } from '../service/user';
-import { DocumentData, QuerySnapshot } from 'firebase/firestore';
+import { getGameScoreForObj } from '../service/score';
+import { getPoolsForSnap, getPoolSize, transferPoolObj } from '../service/pool';
+import { DocumentData, runTransaction, doc } from 'firebase/firestore';
+import { fireStoreInitialized } from "../infrastructure/firebase/firestore";
 
 /**
- * ランキングの更新
+ * ランキングと報酬登録
+ * ランキング解放数と更新したランキンングを比較して
+ * 報酬対象の場合報酬を登録する
+ * Memo:1つでもランキングを更新されたときコールする
  * 処理概要
- * 1.score 更新
- * 2.ランキング変動判定
- * 3.プールの更新
- * 4.ユーザへのreward追加
+ * 1. すでにscoreが登録されているのでスコア、プール情報を再取得
+ * 2. 現在の自分のランキングを取得し、報酬対象かチェック
+ * 3. 報酬対象の時、transaction.get()でドキュメント変更を検知しつつ
+ * ユーザとプールの情報を更新する
+ * 
+ * 処理概要
  * @param gameId 
  * @param score 
  * @param user 
  */
-export const upsertRanking = async (gameId: string, score: number, user: User) =>{
+export const updateRanking = async (gameId: string, score: number, user: User) =>{
     // DEB: debag code
-    //const newScore = score;
-    const newScore = 9981;
+    const newScore = score;
+    const db = fireStoreInitialized();
+    console.log(`start updating ranking`);
 
-    // fetch score data
-    const scoreSnap = await getGameScoreForSnapOrderScore(gameId);
-    const scoreFetchData = transferScoreObj(scoreSnap);
+    // start transaction
+    await runTransaction(db, async (transaction) => {
+        console.log("start update transaction");
+        
+        // reCalculation ranking
+        const scoreData = await getGameScoreForObj(gameId);
+        const afterRankingNo = getNowRankingNo(scoreData, user.userId);
+        
+        // get pool docNo
+        const poolSnap = await getPoolsForSnap(gameId);
+        const poolObject = transferPoolObj(poolSnap);
+        const updatePoolDocNo = poolSnap.docs[afterRankingNo - 1].id;
 
-    // ranking number
-    const beforeRankingNo = getBeforeRankingNo(scoreFetchData, user.userId);;
-    // FIXME:同点のスコアを取ると、名前順で下の判定をされてしまい、後続のらプール対象になる
-    const afterRankingNo = getNewRankingNo(scoreFetchData, newScore);
+        // ranking check
+        if (!isEligibleForRankingReward(getPoolSize(poolSnap), afterRankingNo)) {
+            console.log(`success updating just ranking, but not into poolsize`);
+            return;
+        }
 
-    // update score
-    if (isNewUser(beforeRankingNo)) {
-        console.log("new user");
-        await addScoreDocument(gameId, user.userId, newScore);
-    } else if (isWinOwnScore(scoreFetchData, beforeRankingNo, newScore)) {
-        console.log("Update score already played user");
-        // TODO: fail safe. This should score is unique now but what happens err.
-        // FIXME:同点のスコアを取ると、名前順で下の判定をされてしまい、後続のらプール対象になる
-        const updateDocNo = scoreSnap.docs[beforeRankingNo - 1].id;
-        updateScoreDocByDocNo(gameId, updateDocNo, newScore);
-    } else {
-        console.log("don't update ranking");
-        return;
-    }
+        // get user docNo & reward
+        const updateUserDocNo = user.docNo;
+        const rewardAmount = poolObject[afterRankingNo - 1].potAmount;
 
-    // judge updating ranking 
-    if (!isWinRanking(beforeRankingNo, afterRankingNo)){
-        console.log("failed updating ranking");
-        return;
-    }
-    console.log("success updating just ranking");
+        // refetch pool data & user data
+        const rePoolRef = doc(db, `${gameId}_pools`, updatePoolDocNo);
+        const rePoolSnap = await transaction.get(rePoolRef);
+        const reUserRef = doc(db, `users`, updateUserDocNo);
+        const reUserSnap = await transaction.get(reUserRef);
 
-    // update pool & user reward
-    const poolSnap = await getPoolsForSnap(gameId);
+        if (!rePoolSnap.exists() || !reUserSnap.exists()) {
+            //throw "ticketEvent document does not exist!"
+            console.log("err. snap does not exist in transaction");
+        };
 
-    if (isEligibleForRankingReward(getPoolSize(poolSnap), afterRankingNo)){
-        console.log("get pool");
-        // const updateDocNo = poolSnap.docs[beforeRankingNo - 1].id;
-        // const poolObject = transferPoolObj(poolSnap);
-        // const rewardAmount = poolObject[beforeRankingNo - 1].potAmount;
-        //getReward(gameId, user, updateDocNo, rewardAmount);
-        getReward(gameId, user, poolSnap, afterRankingNo);
-    } else {
-        console.log("can't get pool");
-        return;
-    }
+        transaction.update(rePoolRef, { pot_amount: 0, });
+        transaction.update(reUserRef, { claimable_reward: rewardAmount, });
+    });
 };
 
-const isNewUser = (_beforeRankingNo: number) => {
-    return _beforeRankingNo < 0;
-};
-
-const isWinOwnScore = (_scoreFetchData: DocumentData[],_beforeRankingNo: number, _score: number) => {
-    return _scoreFetchData[_beforeRankingNo - 1].score < _score;
-};
 
 const isEligibleForRankingReward = (rankingSize: number, rankingNo: number) => {
+    console.log(`rankingSize: ${rankingSize}, rankingNo: ${rankingNo}`);
     return rankingSize >= rankingNo;
 };
 
-const getBeforeRankingNo = (_scoreFetchData: DocumentData[], _userId: string) => {
+export const getBeforeRankingNo = (_scoreFetchData: DocumentData[], _userId: string) => {
     const index = _scoreFetchData.findIndex(scoreData => scoreData.userId == _userId);
     if (index == -1) {
         return index;
@@ -87,7 +79,7 @@ const getBeforeRankingNo = (_scoreFetchData: DocumentData[], _userId: string) =>
     return index + 1;
 }
 
-const getNewRankingNo = (_scoreFetchData: DocumentData[], _score: number) => {
+export const getNewRankingNo = (_scoreFetchData: DocumentData[], _score: number) => {
     var newRankingNoIndex =  -1;
     for(let i = 0; i < _scoreFetchData.length; i++) {
         if (_scoreFetchData[i].score < _score) {
@@ -98,19 +90,17 @@ const getNewRankingNo = (_scoreFetchData: DocumentData[], _score: number) => {
     return newRankingNoIndex + 1;
 };
 
-const isWinRankingAlreadyPlayer = (_beforeRankingNo: number ,_afterRankingNo: number) => {
+export const getNowRankingNo = (_scoreFetchData: DocumentData[], _userId: string) => {
+    const index = _scoreFetchData.findIndex(scoreData => scoreData.userId == _userId);
+    if (index == -1) {
+        // dat not found
+        // TODO: throw exception
+        return index;
+    }
+    const newRankingNo = index + 1;
+    return newRankingNo;
+};
+
+export const isUpRanking = (_beforeRankingNo: number ,_afterRankingNo: number) => {
     return _beforeRankingNo > _afterRankingNo;
-};
-
-const isWinRanking = (_beforeRankingNo: number, _afterRankingNo: number) => {
-    return isNewUser(_beforeRankingNo) || isWinRankingAlreadyPlayer(_beforeRankingNo, _afterRankingNo);
-};
-
-const getReward = (gameId: string, user: User, poolSnap: QuerySnapshot<DocumentData, DocumentData>, afterRankingNo: number) =>{
-    const updateDocNo = poolSnap.docs[afterRankingNo - 1].id;
-    const poolObject = transferPoolObj(poolSnap);
-    const rewardAmount = poolObject[afterRankingNo - 1].potAmount;
-
-    updatePoolsByDocNo(gameId, updateDocNo, 0);
-    addClaimableReward(user.docNo, rewardAmount);
 };

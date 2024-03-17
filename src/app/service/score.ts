@@ -71,6 +71,11 @@ export const addScoreDocument = async (gameId: string, userId: string, score: nu
       });
 };
 
+export const updateScoreByGameId = async (gameId: string, newScore: number, userId: string) => {
+    const scoreDocNo = await getMyScoreDocNo(gameId, userId);
+    await updateScoreDocByDocNo(gameId, scoreDocNo, newScore);
+};
+
 export const updateScoreDocByDocNo = async (gameId:string, docNo:string, newScore: number) => {
     const db = initialize();
     const updateScoreRef = doc(db, `${gameId}_score`, docNo);
