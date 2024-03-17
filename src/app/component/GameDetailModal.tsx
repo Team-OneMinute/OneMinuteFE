@@ -6,6 +6,8 @@ import styled from "styled-components";
 // services
 import { decrementLife } from "../service/user";
 import { setTransaction } from "../service/gameTransaction";
+import { addScoreDocument, getMyGameScore } from '../service/score';
+import { betFee } from '../service/bet';
 
 // components
 // import { CountDownMovie } from "../component/countdownMovie";
@@ -27,11 +29,25 @@ const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDe
 
   const clickPlay = async () => {
     console.log(user.docNo);
+    // fetch previous user score data
+    const scoreData = await getMyGameScore(selectedGameId, user.userId);
+    // set new User Score (0)
+    let prevScore = 0;
+    if (scoreData.length == 0) {
+      await addScoreDocument(selectedGameId, user.userId, 0);
+      prevScore = 0;
+    } else {
+      prevScore = scoreData[0].score;
+    }
+    // bet fee
+    betFee();
     // decrement user life -1
     await decrementLife(user.docNo);
     // add gameTransaction
     await setTransaction(selectedGameId, user.userId);
-    router.push(`/play?id=${selectedGameId}`);
+
+    // move play page
+    router.push(`/play?id=${selectedGameId}&score=${prevScore}`);
   }
 
   return (

@@ -1,5 +1,5 @@
 // firebase
-import { DocumentData, QuerySnapshot, collection, doc, getDocs, orderBy, query, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { DocumentData, QuerySnapshot, collection, doc, getDocs, orderBy, query, setDoc, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { fireStoreInitialized } from "../infrastructure/firebase/firestore";
 
 export const getGameScoreForSnapOrderScore = async (gameId: string) => {
@@ -12,12 +12,32 @@ export const getGameScoreForSnapOrderScore = async (gameId: string) => {
     return scoreSnap;
 };
 
+export const getMyScoreDocNo = async (gameId: string, userId: string) => {
+    const db = initialize();
+
+    const scoreRef = collection(db, `${gameId}_score`);
+    const fetchMyScoreQuery = query(scoreRef, where("user_id", "==", userId));
+    const scoreSnap = await getDocs(fetchMyScoreQuery);
+
+    return scoreSnap.docs[0].id;
+};
+
 export const getGameScoreForObj = async (gameId: string) => {
     const db = initialize();
 
     const scoreRef = collection(db, `${gameId}_score`);
     const fetchScoreDescQuery = query(scoreRef, orderBy("score", "desc"));
     const scoreSnap = await getDocs(fetchScoreDescQuery);
+
+    return transferScoreObj(scoreSnap);
+};
+
+export const getMyGameScore = async (gameId: string, userId: string) => {
+    const db = initialize();
+
+    const scoreRef = collection(db, `${gameId}_score`);
+    const fetchMyScoreQuery = query(scoreRef, where("user_id", "==", userId));
+    const scoreSnap = await getDocs(fetchMyScoreQuery);
 
     return transferScoreObj(scoreSnap);
 };
