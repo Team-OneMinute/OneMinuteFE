@@ -37,7 +37,7 @@ export default function App() {
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
 
-  // ユーザ認証ができるまで、userId固定
+  // TODO:ユーザ認証ができるまで、userId固定
   const userId = "0001A";
 
   const pagination = {
@@ -75,7 +75,9 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      // TODO: second fetch, add data in STORE
+      // TODO: add data in store or storage
+      // TODO: add delay fetch for gating other game data, and add store or storage.
+      // TODO: add emergencyGame flg, when release or fatal error. Prevent game selection.
       if (selectedGameId) {
         const poolList = await getPoolsForObj(selectedGameId);
         const rankingList = await getGameScoreForObj(selectedGameId);

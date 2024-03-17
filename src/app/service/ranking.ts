@@ -21,7 +21,10 @@ import { fireStoreInitialized } from "../infrastructure/firebase/firestore";
  * @param user 
  */
 export const updateRanking = async (gameId: string, score: number, user: User) =>{
-    // DEB: debag code
+    // TODO: add security rules for web console.
+    // Otherwise, when someone requests bat data , clash firestore data.
+    
+    // TODO: debag code
     const newScore = score;
     const db = fireStoreInitialized();
     console.log(`start updating ranking`);
@@ -62,6 +65,8 @@ export const updateRanking = async (gameId: string, score: number, user: User) =
 
         transaction.update(rePoolRef, { pot_amount: 0, });
         transaction.update(reUserRef, { claimable_reward: rewardAmount, });
+
+        // TODO: add try catch. When retry times over, log fatal error. 
     });
 };
 

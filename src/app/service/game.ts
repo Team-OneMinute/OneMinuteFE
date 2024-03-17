@@ -1,5 +1,5 @@
 // firebase
-import { collection, query, orderBy, limit, where, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, where, getDocs } from 'firebase/firestore';
 import { fireStoreInitialized } from "../infrastructure/firebase/firestore"
 
 /**

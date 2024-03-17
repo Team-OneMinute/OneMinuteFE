@@ -3,9 +3,6 @@ import React from 'react';
 import styled from "styled-components";
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '../styles';
 
-// components
-import GameDetailModal from "../component/GameDetailModal";
-
 interface position {
     x: number;
     y: number;
@@ -40,7 +37,7 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
     };
 
     const getGameTargetDiv = (games: Game[]) => {
-        // TODO:
+        // TODO: Loading a image from local storage now. Change URL.
         if (games.length > 0) {
             return games.map((game, index) => {
                 return (

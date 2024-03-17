@@ -22,7 +22,7 @@ export default function GamePlayingPage() {
     if (prevScore < newScore) {
       // TODO:認証ができるまでは一旦決め打ち。最終的にはstrage.uidからクレデンシャル引く
       const userId = "0001A";
-      // DEBUG: tmp score
+      // TODO: tmp score
       //const score = newScore;
       const score = 9990;
 

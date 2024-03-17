@@ -22,6 +22,8 @@ interface props {
 }
 
 const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDetailModal, selectedGameId }) => {
+  //TODO: Top-ranking user can not update ranking. Should tell the user.
+
   const router = useRouter();
   if (!selectedGameId || pools.length == 0 || !user) {
     return;

@@ -47,7 +47,6 @@ export const addClaimableReward = async (docNo: string, amount: number) => {
     });
 }
 
-
 const initialize = () => {
     return fireStoreInitialized();
 };
