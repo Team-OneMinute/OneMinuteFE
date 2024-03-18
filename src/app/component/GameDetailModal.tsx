@@ -1,11 +1,11 @@
-"use client"
+'use client';
 import React from 'react';
-import { useRouter } from "next/navigation";
-import styled from "styled-components";
+import { useRouter } from 'next/navigation';
+import styled from 'styled-components';
 
 // services
-import { decrementLife } from "../service/user";
-import { setTransaction } from "../service/gameTransaction";
+import { decrementLife } from '../service/user';
+import { setTransaction } from '../service/gameTransaction';
 import { addScoreDocument, getMyGameScore } from '../service/score';
 import { betFee } from '../service/bet';
 
@@ -22,52 +22,54 @@ interface props {
 }
 
 const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDetailModal, selectedGameId }) => {
-  //TODO: Top-ranking user can not update ranking. Should tell the user.
+    //TODO: Top-ranking user can not update ranking. Should tell the user.
 
-  const router = useRouter();
-  if (!selectedGameId || pools.length == 0 || !user) {
-    return;
-  }
-
-  const clickPlay = async () => {
-    console.log(user.docNo);
-    // fetch previous user score data
-    const scoreData = await getMyGameScore(selectedGameId, user.userId);
-    // set new User Score (0)
-    let prevScore = 0;
-    if (scoreData.length == 0) {
-      await addScoreDocument(selectedGameId, user.userId, 0);
-      prevScore = 0;
-    } else {
-      prevScore = scoreData[0].score;
+    const router = useRouter();
+    if (!selectedGameId || pools.length == 0 || !user) {
+        return;
     }
-    // bet fee
-    betFee();
-    // decrement user life -1
-    await decrementLife(user.docNo);
-    // add gameTransaction
-    await setTransaction(selectedGameId, user.userId);
 
-    // move play page
-    router.push(`/play?id=${selectedGameId}&score=${prevScore}`);
-  }
+    const clickPlay = async () => {
+        console.log(user.docNo);
+        // fetch previous user score data
+        const scoreData = await getMyGameScore(selectedGameId, user.userId);
+        // set new User Score (0)
+        let prevScore = 0;
+        if (scoreData.length == 0) {
+            await addScoreDocument(selectedGameId, user.userId, 0);
+            prevScore = 0;
+        } else {
+            prevScore = scoreData[0].score;
+        }
+        // bet fee
+        betFee();
+        // decrement user life -1
+        await decrementLife(user.docNo);
+        // add gameTransaction
+        await setTransaction(selectedGameId, user.userId);
 
-  return (
-    <Overlay onClick={(e) => e.target === e.currentTarget && closeDetailModal()}>
-      <Content>
-        <SubTitle>Game About</SubTitle>
-        <GameDetail>{game.gameDetail}</GameDetail>
-        <SubTitle>Reward</SubTitle>
-        <RewardDetail>{pools[0].potAmount}</RewardDetail>
-        <SubTitle>Life</SubTitle>
-        <UserLife>❤️✖︎{user.life} → ❤️✖︎{user.life - 1}</UserLife>
-        <PlayButtonArea>
-          <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Free Play</PlayButton>
-          <PlayButton onClick={() => clickPlay()}>Play</PlayButton>
-        </PlayButtonArea>
-      </Content>
-    </Overlay>
-  );
+        // move play page
+        router.push(`/play?id=${selectedGameId}&score=${prevScore}`);
+    };
+
+    return (
+        <Overlay onClick={(e) => e.target === e.currentTarget && closeDetailModal()}>
+            <Content>
+                <SubTitle>Game About</SubTitle>
+                <GameDetail>{game.gameDetail}</GameDetail>
+                <SubTitle>Reward</SubTitle>
+                <RewardDetail>{pools[0].potAmount}</RewardDetail>
+                <SubTitle>Life</SubTitle>
+                <UserLife>
+                    ❤️✖︎{user.life} → ❤️✖︎{user.life - 1}
+                </UserLife>
+                <PlayButtonArea>
+                    <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Free Play</PlayButton>
+                    <PlayButton onClick={() => clickPlay()}>Play</PlayButton>
+                </PlayButtonArea>
+            </Content>
+        </Overlay>
+    );
 };
 
 const SubTitle = styled.div`
@@ -88,14 +90,14 @@ const RewardDetail = styled.div`
 `;
 
 const PlayButton = styled.div`
-  color: #000;
-  border-radius: 8vmin;
-  background: #aacaee;
-  text-align: center;
-  align-items: center;
-  width: 150px;
-  height: 30px;
-  margin: 5%;
+    color: #000;
+    border-radius: 8vmin;
+    background: #aacaee;
+    text-align: center;
+    align-items: center;
+    width: 150px;
+    height: 30px;
+    margin: 5%;
 `;
 
 const Overlay = styled.div`
@@ -122,14 +124,12 @@ const Content = styled.div`
     z-index: 11;
 `;
 
-const UserLife = styled.div`
-  
-`;
+const UserLife = styled.div``;
 
 const PlayButtonArea = styled.div`
-  position: fixed;
-  bottom: 10%;
-  display: flex;
+    position: fixed;
+    bottom: 10%;
+    display: flex;
 `;
 
 export default GameDetailModal;

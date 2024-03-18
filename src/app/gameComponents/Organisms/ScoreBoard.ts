@@ -1,5 +1,5 @@
-import { Rectangle } from "../(Atoms)/Rectangle";
-import { Text } from "../(Atoms)/Text";
+import { Rectangle } from '../Atoms/Rectangle';
+import { Text } from '../Atoms/Text';
 
 export class ScoreBoard {
     canvas: HTMLCanvasElement;
@@ -10,25 +10,21 @@ export class ScoreBoard {
     text: Text;
 
     // constructor
-    constructor(
-        canvas: HTMLCanvasElement,
-        width: number,
-        height: number,
-    ) {
+    constructor(canvas: HTMLCanvasElement, width: number, height: number) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d')!;
         this.width = width;
         this.height = height;
 
         this.rectangle = new Rectangle(canvas, 0, 0, width, height);
-        this.rectangle.setPosition("margin", { right: 20, top: 20 });
+        this.rectangle.setPosition('margin', { right: 20, top: 20 });
 
-        this.text = new Text(canvas, 0, this.rectangle.top + this.rectangle.height / 2, "middle");
+        this.text = new Text(canvas, 0, this.rectangle.top + this.rectangle.height / 2, 'middle');
         this.text.setLeft(this.rectangle.left + 20);
     }
 
     draw(score: number) {
-        this.rectangle.setFrameStyle({lineWidth: 2, strokeColor: "black"});
+        this.rectangle.setFrameStyle({ lineWidth: 2, strokeColor: 'black' });
         this.rectangle.draw();
 
         this.text.setText(`Score: ${score}`);

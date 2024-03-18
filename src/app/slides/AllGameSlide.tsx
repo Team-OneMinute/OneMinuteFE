@@ -1,6 +1,6 @@
-"use client"
+'use client';
 import React from 'react';
-import styled from "styled-components";
+import styled from 'styled-components';
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '../styles';
 
 interface position {
@@ -17,13 +17,20 @@ interface props {
     setIsOpenDetailModal: (isOpen: boolean) => void;
 }
 
-const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId, setSelectedGameId, setIsOpenDetailModal }) => {
-    console.log("selectedGameId: " + selectedGameId);
+const AllGameSlide: React.FC<props> = ({
+    games,
+    rankings,
+    pools,
+    selectedGameId,
+    setSelectedGameId,
+    setIsOpenDetailModal,
+}) => {
+    console.log('selectedGameId: ' + selectedGameId);
     const positionSet = [
-        {x: 20, y: 20},
-        {x: 80, y: 80},
-        {x: 20, y: 80},
-        {x: 80, y: 20},
+        { x: 20, y: 20 },
+        { x: 80, y: 80 },
+        { x: 20, y: 80 },
+        { x: 80, y: 20 },
     ];
 
     const isActive = (gameId: string) => {
@@ -41,9 +48,13 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
         if (games.length > 0) {
             return games.map((game, index) => {
                 return (
-                    <GameTarget isActive={isActive(game.gameId)} position={positionSet[index]} onClick={() => onClickNftAction(game.gameId)}>
-                        <GameThumbnailImage src="/static/images/temp/game_thumnail_1.png" />
-                        <SymbolNftImage src="/static/images/temp/User1.png" />
+                    <GameTarget
+                        isActive={isActive(game.gameId)}
+                        position={positionSet[index]}
+                        onClick={() => onClickNftAction(game.gameId)}
+                    >
+                        <GameThumbnailImage src='/static/images/temp/game_thumnail_1.png' />
+                        <SymbolNftImage src='/static/images/temp/User1.png' />
                     </GameTarget>
                 );
             });
@@ -57,13 +68,13 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
     };
 
     const maxReward = () => {
-        return pools.length? pools[0].potAmount :0;
+        return pools.length ? pools[0].potAmount : 0;
     };
 
     const rankingSummary = () => {
         //const poolSize = pools.length;
         const poolSize = pools.length;
-        if(poolSize === 0) return "a";
+        if (poolSize === 0) return 'a';
         console.log(pools.length);
 
         const firstRange = 0.1;
@@ -74,18 +85,18 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
         const thirdRangeSize = poolSize - firstRangeSize - secondRangeSize;
 
         const firstRangeTopRank = 1;
-        const firstRangeUnderRank =  firstRangeTopRank + firstRangeSize -1;
+        const firstRangeUnderRank = firstRangeTopRank + firstRangeSize - 1;
         const secondRangeTopRank = firstRangeUnderRank + 1;
-        const secondRangeUnderRank = secondRangeTopRank + secondRangeSize -1;
+        const secondRangeUnderRank = secondRangeTopRank + secondRangeSize - 1;
         const thirdRangeTopRank = secondRangeUnderRank + 1;
-        const thirdRangeUnderRank = thirdRangeTopRank + thirdRangeSize -1;
+        const thirdRangeUnderRank = thirdRangeTopRank + thirdRangeSize - 1;
 
-        const firstRangeTopAmount = pools[firstRangeTopRank-1].potAmount;
-        const firstRangeUnderAmount =  pools[firstRangeUnderRank-1].potAmount;
-        const secondRangeTopAmount = pools[secondRangeTopRank-1].potAmount;
-        const secondRangeUnderAmount = pools[secondRangeUnderRank-1].potAmount;
-        const thirdRangeTopAmount = pools[thirdRangeTopRank-1].potAmount;
-        const thirdRangeUnderAmount = pools[thirdRangeUnderRank-1].potAmount;
+        const firstRangeTopAmount = pools[firstRangeTopRank - 1].potAmount;
+        const firstRangeUnderAmount = pools[firstRangeUnderRank - 1].potAmount;
+        const secondRangeTopAmount = pools[secondRangeTopRank - 1].potAmount;
+        const secondRangeUnderAmount = pools[secondRangeUnderRank - 1].potAmount;
+        const thirdRangeTopAmount = pools[thirdRangeTopRank - 1].potAmount;
+        const thirdRangeUnderAmount = pools[thirdRangeUnderRank - 1].potAmount;
 
         return `${firstRangeTopRank} ~ ${firstRangeUnderRank} : ${firstRangeTopAmount} ~ ${firstRangeUnderAmount}
                 ${secondRangeTopRank} ~ ${secondRangeUnderRank} : ${secondRangeTopAmount} ~ ${secondRangeUnderAmount}
@@ -106,7 +117,7 @@ const AllGameSlide: React.FC<props> = ({ games, rankings, pools, selectedGameId,
             </DetailArea>
         </Background>
     );
-  };
+};
 export default AllGameSlide;
 
 const Background = styled.div`
@@ -128,18 +139,18 @@ const GameFieldImage = styled.div`
     background-image: url(/static/images/island/allLand.png);
     background-size: cover;
 `;
-const GameTarget = styled.div<{isActive: boolean, position: position}>`
+const GameTarget = styled.div<{ isActive: boolean; position: position }>`
     position: absolute;
-    width: ${props => props.isActive ? 50 : 30}px;
-    height: ${props => props.isActive ? 50 : 30}px;
-    left: ${props => props.position.x}px;
-    top: ${props => props.position.y}px;
-    ${props => props.isActive ? "border: 3px solid #ff0000" : ""};
+    width: ${(props) => (props.isActive ? 50 : 30)}px;
+    height: ${(props) => (props.isActive ? 50 : 30)}px;
+    left: ${(props) => props.position.x}px;
+    top: ${(props) => props.position.y}px;
+    ${(props) => (props.isActive ? 'border: 3px solid #ff0000' : '')};
 `;
 const GameThumbnailImage = styled.img`
     width: 100%;
     height: 50%;
-`
+`;
 const SymbolNftImage = styled.img`
     width: 100%;
     height: 50%;
@@ -156,23 +167,23 @@ const DetailArea = styled.div`
 const RankingNumberInfo = styled.div`
     width: 100%;
     height: 30px;
-    color: #FFF;
+    color: #fff;
 `;
 
 const RewardInfo = styled.div`
     width: 100%;
     height: 30px;
-    color: #FFF;
+    color: #fff;
 `;
 
 const RankingSummaryInfo = styled.div`
     width: 100%;
     height: 80px;
-    color: #FFF;
+    color: #fff;
 `;
 
 const DetailButton = styled.div`
     width: 100%;
     height: 30px;
-    color: #FFF;
+    color: #fff;
 `;

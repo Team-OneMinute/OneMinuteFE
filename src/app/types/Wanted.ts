@@ -6,4 +6,4 @@ type Wanted = {
     gameThumbnailUrl: string;
     userImageUrl: string;
     topAmount: number;
-  };
+};

@@ -8,4 +8,4 @@ type Game = {
     topUserId: string;
     isOpen: boolean;
     start: Date;
-  };
+};

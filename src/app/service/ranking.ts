@@ -2,7 +2,7 @@
 import { getGameScoreForObj } from '../service/score';
 import { getPoolsForSnap, getPoolSize, transferPoolObj } from '../service/pool';
 import { DocumentData, runTransaction, doc } from 'firebase/firestore';
-import { fireStoreInitialized } from "../infrastructure/firebase/firestore";
+import { fireStoreInitialized } from '../infrastructure/firebase/firestore';
 
 /**
  * ランキングと報酬登録
@@ -14,16 +14,16 @@ import { fireStoreInitialized } from "../infrastructure/firebase/firestore";
  * 2. 現在の自分のランキングを取得し、報酬対象かチェック
  * 3. 報酬対象の時、transaction.get()でドキュメント変更を検知しつつ
  * ユーザとプールの情報を更新する
- * 
+ *
  * 処理概要
- * @param gameId 
- * @param score 
- * @param user 
+ * @param gameId
+ * @param score
+ * @param user
  */
-export const updateRanking = async (gameId: string, score: number, user: User) =>{
+export const updateRanking = async (gameId: string, score: number, user: User) => {
     // TODO: add security rules for web console.
     // Otherwise, when someone requests bat data , clash firestore data.
-    
+
     // TODO: debag code
     const newScore = score;
     const db = fireStoreInitialized();
@@ -31,12 +31,12 @@ export const updateRanking = async (gameId: string, score: number, user: User) =
 
     // start transaction
     await runTransaction(db, async (transaction) => {
-        console.log("start update transaction");
-        
+        console.log('start update transaction');
+
         // reCalculation ranking
         const scoreData = await getGameScoreForObj(gameId);
         const afterRankingNo = getNowRankingNo(scoreData, user.userId);
-        
+
         // get pool docNo
         const poolSnap = await getPoolsForSnap(gameId);
         const poolObject = transferPoolObj(poolSnap);
@@ -60,16 +60,15 @@ export const updateRanking = async (gameId: string, score: number, user: User) =
 
         if (!rePoolSnap.exists() || !reUserSnap.exists()) {
             //throw "ticketEvent document does not exist!"
-            console.log("err. snap does not exist in transaction");
-        };
+            console.log('err. snap does not exist in transaction');
+        }
 
-        transaction.update(rePoolRef, { pot_amount: 0, });
-        transaction.update(reUserRef, { claimable_reward: rewardAmount, });
+        transaction.update(rePoolRef, { pot_amount: 0 });
+        transaction.update(reUserRef, { claimable_reward: rewardAmount });
 
-        // TODO: add try catch. When retry times over, log fatal error. 
+        // TODO: add try catch. When retry times over, log fatal error.
     });
 };
-
 
 const isEligibleForRankingReward = (rankingSize: number, rankingNo: number) => {
     console.log(`rankingSize: ${rankingSize}, rankingNo: ${rankingNo}`);
@@ -77,26 +76,26 @@ const isEligibleForRankingReward = (rankingSize: number, rankingNo: number) => {
 };
 
 export const getBeforeRankingNo = (_scoreFetchData: DocumentData[], _userId: string) => {
-    const index = _scoreFetchData.findIndex(scoreData => scoreData.userId == _userId);
+    const index = _scoreFetchData.findIndex((scoreData) => scoreData.userId == _userId);
     if (index == -1) {
         return index;
     }
     return index + 1;
-}
+};
 
 export const getNewRankingNo = (_scoreFetchData: DocumentData[], _score: number) => {
-    var newRankingNoIndex =  -1;
-    for(let i = 0; i < _scoreFetchData.length; i++) {
+    var newRankingNoIndex = -1;
+    for (let i = 0; i < _scoreFetchData.length; i++) {
         if (_scoreFetchData[i].score < _score) {
             newRankingNoIndex = i;
             break;
-        } 
-    };
+        }
+    }
     return newRankingNoIndex + 1;
 };
 
 export const getNowRankingNo = (_scoreFetchData: DocumentData[], _userId: string) => {
-    const index = _scoreFetchData.findIndex(scoreData => scoreData.userId == _userId);
+    const index = _scoreFetchData.findIndex((scoreData) => scoreData.userId == _userId);
     if (index == -1) {
         // dat not found
         // TODO: throw exception
@@ -106,6 +105,6 @@ export const getNowRankingNo = (_scoreFetchData: DocumentData[], _userId: string
     return newRankingNo;
 };
 
-export const isUpRanking = (_beforeRankingNo: number ,_afterRankingNo: number) => {
+export const isUpRanking = (_beforeRankingNo: number, _afterRankingNo: number) => {
     return _beforeRankingNo > _afterRankingNo;
 };

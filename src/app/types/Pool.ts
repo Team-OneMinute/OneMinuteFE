@@ -3,4 +3,4 @@ type Pool = {
     nextId: string;
     potAmount: number;
     userId: string;
-  };
+};

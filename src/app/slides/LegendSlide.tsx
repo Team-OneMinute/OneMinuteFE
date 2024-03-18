@@ -1,17 +1,13 @@
-"use client"
-import styled from "styled-components";
+'use client';
+import styled from 'styled-components';
 
 interface props {
     pageName: string;
 }
 
 const LegendSlide: React.FC<props> = ({ pageName }) => {
-    return (
-        <Background>
-            {pageName}
-        </Background>
-    );
-  };
+    return <Background>{pageName}</Background>;
+};
 export default LegendSlide;
 
 const Background = styled.div`
