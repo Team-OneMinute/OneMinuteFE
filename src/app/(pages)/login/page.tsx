@@ -1,6 +1,7 @@
 'use client';
 import firebase from 'firebase/compat/app';
-import firebaseui from 'firebaseui';
+import * as firebaseui from 'firebaseui';
+import 'firebaseui/dist/firebaseui.css';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { firebaseConfig } from '../../infrastructure/firebase/firebaseConfig';
 
@@ -10,7 +11,7 @@ export default function LoginPage() {
     };
 
     // firebase.auth();
-    let ui = new firebaseui.auth.AuthUI(getAuth(initialize()));
+    let ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(getAuth(initialize()));
     ui.start('#firebaseui-auth-container', {
         signInOptions: [
             {
@@ -21,6 +22,6 @@ export default function LoginPage() {
         // Other config options...
     });
     return (
-        <div>login Page</div>
+        <div id="firebaseui-auth-container">login Page</div>
     );
 }
