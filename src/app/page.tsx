@@ -1,5 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht, USER_AREA_MARGIN, USER_NFT_IMAGE_SIZE } from './styles';
 
@@ -24,7 +25,8 @@ import GameDetailModal from './component/GameDetailModal';
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
 export default function App() {
-    // TODO: 右スワイプでゲーム画面に戻れる問題あり
+	// TODO: 右スワイプでゲーム画面に戻れる問題あり
+	const router = useRouter();
     const [games, setGames] = useState<Game[]>([]);
     const [rankings, setRankings] = useState<Score[]>([]);
     const [pools, setPools] = useState<Pool[]>([]);
@@ -86,10 +88,13 @@ export default function App() {
     return (
         <>
             <SwiperContainer>
-                <UserArea>
-                    <UserNftImg src='/static/images/temp/tmpUser.png' />
-                    <UserTotalAmount>$1000</UserTotalAmount>
-                </UserArea>
+                <HeaderArea>
+                    <UserArea>
+                        <UserNftImg src='/static/images/temp/tmpUser.png' />
+                        <UserTotalAmount>$1000</UserTotalAmount>
+                    </UserArea>
+                    <LoginArea onClick={() => router.push('/login')}>ログイン</LoginArea>
+                </HeaderArea>
                 <Swiper pagination={pagination} modules={[Pagination]}>
                     <SwiperSlide>
                         <AllGamesSlide
@@ -137,13 +142,21 @@ const SwiperContainer = styled.div`
     --swiper-pagination-bullet-height: ${NAVIGATION_AREA_HEIGHT}px;
 `;
 
-const UserArea = styled.div`
+const HeaderArea = styled.div`
+    width: calc(100% - 32px);
     position: absolute;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     margin: ${USER_AREA_MARGIN}px;
     z-index: 2;
+`;
+
+const UserArea = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 `;
 
 const UserNftImg = styled.img`
@@ -156,4 +169,8 @@ const UserTotalAmount = styled.div`
     font-size: 16px;
     font-weight: bold;
     color: #ffffff;
+`;
+
+const LoginArea = styled.div`
+	color: #fff;
 `;
