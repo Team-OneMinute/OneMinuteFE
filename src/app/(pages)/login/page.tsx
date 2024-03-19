@@ -2,26 +2,46 @@
 import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { firebaseConfig } from '../../infrastructure/firebase/firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/app/service/auth';
+import { useEffect } from 'react';
 
 export default function LoginPage() {
-    const initialize = () => {
-        return firebase.initializeApp(firebaseConfig);
-    };
+    useEffect(() => {
+        const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
 
-    // firebase.auth();
-    let ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(getAuth(initialize()));
-    ui.start('#firebaseui-auth-container', {
-        signInOptions: [
-            {
-                provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                signInMethod: firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
+        ui.start('#firebaseui-auth-container', {
+            callbacks: {
+                signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+                    // Action if the user is authenticated successfully
+                    return true;
+                },
+                uiShown: function () {
+                    // This is what should happen when the form is full loaded. In this example, I hide the loader element.
+                    document.getElementById('loader')!.style.display = 'none';
+                },
             },
-        ],
-        // Other config options...
-    });
+            signInSuccessUrl: 'https://localhost/', // This is where should redirect if the sign in is successful.
+            signInOptions: [
+                // This array contains all the ways an user can authenticate in your application. For this example, is only by email.
+                {
+                    provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                    signInMethod: firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
+                    requireDisplayName: true,
+                },
+            ],
+            tosUrl: 'https://www.example.com/terms-conditions', // URL to you terms and conditions.
+            privacyPolicyUrl: function () {
+                // TODO: add regal policy
+                window.location.assign('https://www.example.com/privacy-policy');
+            },
+        });
+    }, []);
+
     return (
-        <div id="firebaseui-auth-container">login Page</div>
+        <div>
+            <div id='firebaseui-auth-container'>login Page</div>
+            <div id="loader">Now Loading...</div>
+        </div>
     );
 }
