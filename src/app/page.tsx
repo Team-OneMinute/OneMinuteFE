@@ -15,6 +15,7 @@ import './styles.css';
 import { getAllActiveGames } from './service/game';
 import { getPoolsForObj } from './service/pool';
 import { getUser } from './service/user';
+import { getUid } from './service/auth';
 
 // slides
 import AllGamesSlide from './slides/AllGameSlide';
@@ -27,6 +28,7 @@ const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 export default function App() {
 	// TODO: 右スワイプでゲーム画面に戻れる問題あり
 	const router = useRouter();
+	const [uid, setUid] = useState<string | null>(null);
     const [games, setGames] = useState<Game[]>([]);
     const [rankings, setRankings] = useState<Score[]>([]);
     const [pools, setPools] = useState<Pool[]>([]);
@@ -48,8 +50,18 @@ export default function App() {
         setIsOpenDetailModal(false);
     }, []);
 
-    useEffect(() => {
-        (async () => {
+	useEffect(() => {
+		// get login user
+		getUid(setUid);
+	}, []);
+
+	// TODO: デバッグ用のuseEffect。あとで消す
+	useEffect(() => {
+		console.log('uid: ' + uid);
+	}, [uid]);
+
+	useEffect(() => {
+		(async () => {
             // fetch from database
             const gameList = await getAllActiveGames();
             const userData = await getUser(userId);

@@ -3,9 +3,10 @@ import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/app/service/auth';
+import { getAuth } from '@/app/service/auth';
 import { useEffect } from 'react';
 
+// TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
     useEffect(() => {
         const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
