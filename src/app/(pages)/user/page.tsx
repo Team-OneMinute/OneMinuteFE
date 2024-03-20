@@ -134,7 +134,7 @@ const MailAddress = styled.div`
 
 const HistoryArea = styled.div`
     width: 100%;
-    height: 45%;
+    height: 40%;
     margin-top: 5%;
 `;
 
