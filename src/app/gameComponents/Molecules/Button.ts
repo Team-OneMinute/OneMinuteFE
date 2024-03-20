@@ -1,6 +1,6 @@
-import { Rectangle } from '../Atoms/Rectangle';
-import { Text } from '../Atoms/Text';
-import { PositionPoint, PositionType } from '../Atoms/const';
+import { Rectangle } from '@/app/gameComponents/Atoms/Rectangle';
+import { Text } from '@/app/gameComponents/Atoms/Text';
+import { PositionPoint, PositionType } from '@/app/gameComponents/Atoms/const';
 
 export class Button {
     canvas: HTMLCanvasElement;

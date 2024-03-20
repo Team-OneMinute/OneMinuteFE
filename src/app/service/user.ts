@@ -1,6 +1,6 @@
 // firebase
 import { collection, query, orderBy, limit, where, getDocs, doc, increment, updateDoc } from 'firebase/firestore';
-import { fireStoreInitialized } from '../infrastructure/firebase/firestore';
+import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
 
 /**
  * Fetch user

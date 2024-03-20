@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import styled from 'styled-components';
-import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '../styles';
+import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '@/app/styles';
 
 interface position {
     x: number;

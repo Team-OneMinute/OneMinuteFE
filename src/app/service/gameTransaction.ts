@@ -1,6 +1,6 @@
 // firebase
 import { collection, query, orderBy, limit, where, getDocs, doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { fireStoreInitialized } from '../infrastructure/firebase/firestore';
+import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
 
 // util
 import { dateFormatForString } from '../utils/date';

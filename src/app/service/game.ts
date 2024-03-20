@@ -1,6 +1,6 @@
 // firebase
 import { collection, query, orderBy, where, getDocs } from 'firebase/firestore';
-import { fireStoreInitialized } from '../infrastructure/firebase/firestore';
+import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
 
 /**
  * Fetch active games limit number

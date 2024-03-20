@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Character, TouchVector } from '../Atoms/Character';
-import { ScoreBoard } from '../Organisms/ScoreBoard';
-import { ResultBoard } from '../Organisms/ResultBoard';
+import { Character, TouchVector } from '@/app/gameComponents/Atoms/Character';
+import { ScoreBoard } from '@/app/gameComponents/Organisms/ScoreBoard';
+import { ResultBoard } from '@/app/gameComponents/Organisms/ResultBoard';
 
 const gravity = 0.1; // 重力加速度
 const groundHeight = 30; // 地面の高さ

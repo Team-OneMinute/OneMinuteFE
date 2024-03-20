@@ -1,6 +1,6 @@
-import { Rectangle } from '../Atoms/Rectangle';
-import { Text } from '../Atoms/Text';
-import { Button } from '../Molecules/Button';
+import { Rectangle } from '@/app/gameComponents/Atoms/Rectangle';
+import { Text } from '@/app/gameComponents/Atoms/Text';
+import { Button } from '@/app/gameComponents/Molecules/Button';
 
 export class ResultBoard {
     canvas: HTMLCanvasElement;

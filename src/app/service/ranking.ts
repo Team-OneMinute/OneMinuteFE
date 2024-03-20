@@ -1,8 +1,8 @@
 // services
-import { getGameScoreForObj } from '../service/score';
-import { getPoolsForSnap, getPoolSize, transferPoolObj } from '../service/pool';
+import { getGameScoreForObj } from '@/app/service/score';
+import { getPoolsForSnap, getPoolSize, transferPoolObj } from '@/app/service/pool';
 import { DocumentData, runTransaction, doc } from 'firebase/firestore';
-import { fireStoreInitialized } from '../infrastructure/firebase/firestore';
+import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
 
 /**
  * ランキングと報酬登録

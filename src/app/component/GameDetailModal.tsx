@@ -4,13 +4,13 @@ import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 
 // services
-import { decrementLife } from '../service/user';
-import { setTransaction } from '../service/gameTransaction';
-import { addScoreDocument, getMyGameScore } from '../service/score';
-import { betFee } from '../service/bet';
+import { decrementLife } from '@/app/service/user';
+import { setTransaction } from '@/app/service/gameTransaction';
+import { addScoreDocument, getMyGameScore } from '@/app/service/score';
+import { betFee } from '@/app/service/bet';
 
 // components
-// import { CountDownMovie } from "../component/countdownMovie";
+// import { CountDownMovie } from "@/app/component/countdownMovie";
 
 interface props {
     game: Game;

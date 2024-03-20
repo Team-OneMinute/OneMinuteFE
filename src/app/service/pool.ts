@@ -1,6 +1,6 @@
 // firebase
 import { collection, query, orderBy, getDocs, QuerySnapshot, DocumentData, doc, updateDoc } from 'firebase/firestore';
-import { fireStoreInitialized } from '../infrastructure/firebase/firestore';
+import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
 
 /**
  * Fetch active pools limit number

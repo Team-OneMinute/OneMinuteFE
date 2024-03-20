@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import firebase from 'firebase/compat/app';
 import { Auth, signOut, User as AuthUser, getAuth as getAuthFromFirebase, onAuthStateChanged } from 'firebase/auth';
-import { firebaseConfig } from '../infrastructure/firebase/firebaseConfig';
+import { firebaseConfig } from '@/app/infrastructure/firebase/firebaseConfig';
 
 // services
 import { userCredential } from '@/app/service/credential';

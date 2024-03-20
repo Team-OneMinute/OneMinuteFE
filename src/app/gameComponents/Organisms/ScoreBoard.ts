@@ -1,5 +1,5 @@
-import { Rectangle } from '../Atoms/Rectangle';
-import { Text } from '../Atoms/Text';
+import { Rectangle } from '@/app/gameComponents/Atoms/Rectangle';
+import { Text } from '@/app/gameComponents/Atoms/Text';
 
 export class ScoreBoard {
     canvas: HTMLCanvasElement;

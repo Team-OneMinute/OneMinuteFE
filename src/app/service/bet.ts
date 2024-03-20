@@ -12,7 +12,7 @@ import {
     updateDoc,
     where,
 } from 'firebase/firestore';
-import { fireStoreInitialized } from '../infrastructure/firebase/firestore';
+import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
 
 export const betFee = () => {
     // TODO: make betFee Method
