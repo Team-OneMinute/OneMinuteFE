@@ -15,7 +15,7 @@ import './styles.css';
 import { getAllActiveGames } from './service/game';
 import { getPoolsForObj } from './service/pool';
 import { getUser } from './service/user';
-import { getUid } from './service/auth';
+import { authInitialize, isLogin } from './service/authentication';
 
 // slides
 import AllGamesSlide from './slides/AllGameSlide';
@@ -23,18 +23,22 @@ import GameGenreSlide from './slides/GameGenreSlide';
 import { getGameScoreForObj } from './service/score';
 import GameDetailModal from './component/GameDetailModal';
 
+// TODO: add type file
+import { User as AuthUser } from 'firebase/auth';
+
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
 export default function App() {
-	// TODO: 右スワイプでゲーム画面に戻れる問題あり
-	const router = useRouter();
-	const [uid, setUid] = useState<string | null>(null);
+    // TODO: 右スワイプでゲーム画面に戻れる問題あり
+    const router = useRouter();
     const [games, setGames] = useState<Game[]>([]);
     const [rankings, setRankings] = useState<Score[]>([]);
     const [pools, setPools] = useState<Pool[]>([]);
     const [user, setUser] = useState<User | null>(null);
     const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
     const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
+    // TODO: add session strage or local storage or cache
+    const [authUser, setAuthUser] = useState<AuthUser | null | undefined>();
 
     // TODO:ユーザ認証ができるまで、userId固定
     const userId = '0001A';
@@ -50,18 +54,21 @@ export default function App() {
         setIsOpenDetailModal(false);
     }, []);
 
-	useEffect(() => {
-		// get login user
-		getUid(setUid);
-	}, []);
+    useEffect(() => {
+        // authentication user
+        const user = authInitialize(setAuthUser);
+    }, []);
 
-	// TODO: デバッグ用のuseEffect。あとで消す
-	useEffect(() => {
-		console.log('uid: ' + uid);
-	}, [uid]);
+    // login check
+    useEffect(() => {
+        // TODO:close loading
+        // TODO: change login button
 
-	useEffect(() => {
-		(async () => {
+        isLogin(authUser);
+    }, [authUser]);
+
+    useEffect(() => {
+        (async () => {
             // fetch from database
             const gameList = await getAllActiveGames();
             const userData = await getUser(userId);
@@ -184,5 +191,5 @@ const UserTotalAmount = styled.div`
 `;
 
 const LoginArea = styled.div`
-	color: #fff;
+    color: #fff;
 `;
