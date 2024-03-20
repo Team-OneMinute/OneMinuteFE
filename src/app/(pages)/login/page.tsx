@@ -1,13 +1,16 @@
 'use client';
+import { useEffect } from 'react';
+import styled from 'styled-components';
+
+// firebase
 import firebase from 'firebase/compat/app';
 import { Auth, signOut, User as AuthUser, getAuth as getAuthFromFirebase, onAuthStateChanged } from 'firebase/auth';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
-import { useEffect } from 'react';
+
+// services
 import { getAuthentication, logout } from '@/app/service/authentication';
 import { userCredential } from '@/app/service/credential';
-
-const { removeCredentialStorage } = userCredential();
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
@@ -62,11 +65,18 @@ export default function LoginPage() {
     }, []);
 
     return (
-        <div>
+        <Background>
             <div id='firebaseui-auth-container'>login Page</div>
             // TODO: change loading image
             <div id='loader'>Now Loading...</div>
             <div onClick={() => logout()}> log out </div>
-        </div>
+        </Background>
     );
 }
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(/static/images/background/background_black.png);
+    background-size: cover;
+`;
