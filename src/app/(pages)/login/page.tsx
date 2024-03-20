@@ -4,19 +4,13 @@ import { Auth, signOut, User as AuthUser, getAuth as getAuthFromFirebase, onAuth
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 import { useEffect } from 'react';
-import { getAuthentication } from '@/app/service/authentication';
+import { getAuthentication, logout } from '@/app/service/authentication';
 import { userCredential } from '@/app/service/credential';
 
 const { removeCredentialStorage } = userCredential();
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
-    const logout = async () => {
-        // TODO: remove session storage
-        const auth = getAuthentication();
-        await signOut(auth);
-        removeCredentialStorage();
-    };
 
     useEffect(() => {
         const auth = getAuthentication();
@@ -44,7 +38,6 @@ export default function LoginPage() {
         ui.start('#firebaseui-auth-container', {
             callbacks: {
                 signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                    // Action if the user is authenticated successfully
                     // TODO: redirect TOP page
                     return true;
                 },
@@ -55,11 +48,10 @@ export default function LoginPage() {
             },
             signInSuccessUrl: '/', // This is where should redirect if the sign in is successful.
             signInOptions: [
-                // This array contains all the ways an user can authenticate in your application. For this example, is only by email.
-                {
-                    provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                    //signInMethod: firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
-                },
+                    // TODO: add twitter
+                    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
             ],
             tosUrl: 'https://www.example.com/terms-conditions', // URL to you terms and conditions.
             privacyPolicyUrl: function () {
@@ -72,6 +64,7 @@ export default function LoginPage() {
     return (
         <div>
             <div id='firebaseui-auth-container'>login Page</div>
+            // TODO: change loading image
             <div id='loader'>Now Loading...</div>
             <div onClick={() => logout()}> log out </div>
         </div>
