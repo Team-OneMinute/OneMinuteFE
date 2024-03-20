@@ -21,6 +21,8 @@ export const getUser = async (userId: string) => {
             userId: String(data.user_id),
             name: String(data.name),
             life: Number(data.life),
+            claimableReward: Number(data.claimable_reward),
+            totalClaimed: Number(data.total_claimed),
         } as User;
     });
 

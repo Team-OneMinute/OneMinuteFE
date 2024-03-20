@@ -3,6 +3,8 @@ type User = {
     userId: string;
     name: string;
     life: number;
+    claimableReward: number;
+    totalClaimed: number;
 };
 
 type UserCredential = {

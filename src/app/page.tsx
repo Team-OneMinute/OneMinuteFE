@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht, USER_AREA_MARGIN, USER_NFT_IMAGE_SIZE } from './styles';
+import { DNA } from 'react-loader-spinner';
 
 // Swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -36,6 +37,7 @@ export default function App() {
     const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
     const [credential, setCredential] = useState<UserCredential | null>(null);
     const [initialized, setInitialized] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const pagination = {
         clickable: true,
@@ -51,7 +53,6 @@ export default function App() {
     const topPageInitialized = async (): Promise<void> => {
         authInitialize();
 
-        // fetch from database
         const gameList = await getAllActiveGames();
         const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount);
         await setGames(sortedGameList);
@@ -85,9 +86,11 @@ export default function App() {
             (async () => {
                 const userData = await getUser(userId);
                 await setUser(userData);
+                console.log(userData);
             })();
 
             // TODO: other game fetch and add store
+            setLoading(false);
         }
     };
 
@@ -124,50 +127,90 @@ export default function App() {
         })();
     }, [selectedGameId]);
 
+    const totalGetReward = () => {
+        if (user == null) {
+            return;
+        }
+
+        const totalReward = user?.claimableReward + user?.totalClaimed;
+        return totalReward > 0 ? totalReward : 0;
+    };
+
+    const loginUserHeaderArea = () => {
+        return (
+            // TODO: blockchain接続後、src入れかえ
+            <UserArea onClick={() => router.push('/user')}>
+                <UserNftImg src='/static/images/temp/tmpUser.png' />
+                <UserTotalAmount>{`${totalGetReward()}`}</UserTotalAmount>
+            </UserArea>
+        );
+    };
+
+    const logoutUserHeaderArea = () => {
+        return (
+            // TODO:無課金ユーザ用画像用意
+            <>
+                <UserArea onClick={() => router.push('/user')}>
+                    <UserNftImg src='/static/images/temp/tmpUser.png' />
+                </UserArea>
+                <LoginArea onClick={() => router.push('/login')}>ログイン</LoginArea>
+            </>
+        );
+    };
+
     return (
         <>
-            <SwiperContainer>
-                <HeaderArea>
-                    <UserArea>
-                        <UserNftImg src='/static/images/temp/tmpUser.png' />
-                        <UserTotalAmount>$1000</UserTotalAmount>
-                    </UserArea>
-                    <LoginArea onClick={() => router.push('/login')}>ログイン</LoginArea>
-                </HeaderArea>
-                <Swiper pagination={pagination} modules={[Pagination]}>
-                    <SwiperSlide>
-                        <AllGamesSlide
-                            games={games}
+            <DNA
+                visible={loading}
+                height='70%'
+                width='50%'
+                ariaLabel='dna-loading'
+                wrapperStyle={{}}
+                wrapperClass='dna-wrapper'
+            />
+            {loading == false && (
+                <>
+                    <SwiperContainer>
+                        <HeaderArea>
+                            {credential == null && logoutUserHeaderArea()}
+                            {credential != null && loginUserHeaderArea()}
+                        </HeaderArea>
+                        <Swiper pagination={pagination} modules={[Pagination]}>
+                            <SwiperSlide>
+                                <AllGamesSlide
+                                    games={games}
+                                    rankings={rankings}
+                                    pools={pools}
+                                    selectedGameId={selectedGameId}
+                                    setSelectedGameId={setSelectedGameId}
+                                    setIsOpenDetailModal={setIsOpenDetailModal}
+                                />
+                            </SwiperSlide>
+                            <SwiperSlide>
+                                <GameGenreSlide pageName='Action Slide' />
+                            </SwiperSlide>
+                            <SwiperSlide>
+                                <GameGenreSlide pageName='Battle Slide' />
+                            </SwiperSlide>
+                            <SwiperSlide>
+                                <GameGenreSlide pageName='Shooting Slide' />
+                            </SwiperSlide>
+                            <SwiperSlide>
+                                <GameGenreSlide pageName='Puzzle Slide' />
+                            </SwiperSlide>
+                        </Swiper>
+                    </SwiperContainer>
+                    {isOpenDetailModal && (
+                        <GameDetailModal
+                            game={games.find((game) => game.gameId == selectedGameId) || games[0]}
                             rankings={rankings}
                             pools={pools}
+                            user={user}
+                            closeDetailModal={closeDetailModal}
                             selectedGameId={selectedGameId}
-                            setSelectedGameId={setSelectedGameId}
-                            setIsOpenDetailModal={setIsOpenDetailModal}
                         />
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        <GameGenreSlide pageName='Action Slide' />
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        <GameGenreSlide pageName='Battle Slide' />
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        <GameGenreSlide pageName='Shooting Slide' />
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        <GameGenreSlide pageName='Puzzle Slide' />
-                    </SwiperSlide>
-                </Swiper>
-            </SwiperContainer>
-            {isOpenDetailModal && (
-                <GameDetailModal
-                    game={games.find((game) => game.gameId == selectedGameId) || games[0]}
-                    rankings={rankings}
-                    pools={pools}
-                    user={user}
-                    closeDetailModal={closeDetailModal}
-                    selectedGameId={selectedGameId}
-                />
+                    )}
+                </>
             )}
         </>
     );

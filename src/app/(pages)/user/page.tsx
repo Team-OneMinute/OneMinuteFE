@@ -1,15 +1,17 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { DefaultTemplate } from '@/app/templates/DefaultTemplate';
-import styles from '../../page.module.css';
+import styled from 'styled-components';
 
 export default function UserPage() {
-    const router = useRouter();
     return (
-        <main className={styles.main}>
-            <DefaultTemplate title='User Page'>
-                <button onClick={() => router.push('/')}>Top</button>
-            </DefaultTemplate>
-        </main>
+        <Background>
+            <div>aaa</div>
+        </Background>
     );
 }
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(/static/images/background/background_black.png);
+    background-size: cover;
+`;

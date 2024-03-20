@@ -19,9 +19,7 @@ export default function LoginPage() {
     };
 
     useEffect(() => {
-
         const auth = getAuthentication();
-
         firebase.auth().onAuthStateChanged((user) => {
             console.log('authentication');
             if (user != null) {
