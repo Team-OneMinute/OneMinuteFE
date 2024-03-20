@@ -15,16 +15,13 @@ import './styles.css';
 import { getAllActiveGames } from './service/game';
 import { getPoolsForObj } from './service/pool';
 import { getUser } from './service/user';
-import { authInitialize, isLogin } from './service/authentication';
+import { authInitialize, getCredential } from './service/authentication';
 
 // slides
 import AllGamesSlide from './slides/AllGameSlide';
 import GameGenreSlide from './slides/GameGenreSlide';
 import { getGameScoreForObj } from './service/score';
 import GameDetailModal from './component/GameDetailModal';
-
-// TODO: add type file
-import { User as AuthUser } from 'firebase/auth';
 
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
@@ -37,11 +34,8 @@ export default function App() {
     const [user, setUser] = useState<User | null>(null);
     const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
     const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
-    // TODO: add session strage or local storage or cache
-    const [authUser, setAuthUser] = useState<AuthUser | null | undefined>();
-
-    // TODO:ユーザ認証ができるまで、userId固定
-    const userId = '0001A';
+    const [credential, setCredential] = useState<UserCredential | null>(null);
+    const [initialized, setInitialized] = useState<boolean>(false);
 
     const pagination = {
         clickable: true,
@@ -54,35 +48,61 @@ export default function App() {
         setIsOpenDetailModal(false);
     }, []);
 
-    useEffect(() => {
-        // authentication user
-        const user = authInitialize(setAuthUser);
-    }, []);
+    const topPageInitialized = async (): Promise<void> => {
+        authInitialize();
 
-    // login check
-    useEffect(() => {
-        // TODO:close loading
-        // TODO: change login button
+        // fetch from database
+        const gameList = await getAllActiveGames();
+        const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount);
+        await setGames(sortedGameList);
+        if (games.length > 0) {
+            setSelectedGameId(games[0].gameId);
+        }
 
-        isLogin(authUser);
-    }, [authUser]);
+        setInitialized(true);
+    };
 
-    useEffect(() => {
-        (async () => {
-            // fetch from database
-            const gameList = await getAllActiveGames();
-            const userData = await getUser(userId);
-
-            const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount);
-            await setGames(sortedGameList);
-            if (games.length > 0) {
-                setSelectedGameId(games[0].gameId);
+    const afterInitialized = () => {
+        console.log('initialized started');
+        if (initialized == true) {
+            // credential init
+            console.log('credential check start');
+            const tmpCredential = getCredential();
+            console.log('credential');
+            console.log(tmpCredential);
+            if (tmpCredential != null) {
+                // TODO: log in dev environments only
+                setCredential(tmpCredential);
             }
 
-            await setUser(userData);
-        })();
+            // FIXME:ユーザ認証ができるまで、userId固定
+            // firebase function ができたら、コメント消して処理消す
+            // if (credential) {
+            //     const userData = await getUser(credential.uid);
+            //     await setUser(userData);
+            // }
+            const userId = '0001A';
+            (async () => {
+                const userData = await getUser(userId);
+                await setUser(userData);
+            })();
+
+            // TODO: other game fetch and add store
+        }
+    };
+
+    // initialize
+    useEffect(() => {
+        console.log('use effect');
+        topPageInitialized();
     }, []);
 
+    // after initialized
+    useEffect(() => {
+        afterInitialized();
+    }, [initialized]);
+
+    // TODO: いるかこれ
     useEffect(() => {
         if (games.length > 0) {
             setSelectedGameId(games[0].gameId);

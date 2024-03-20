@@ -4,29 +4,28 @@ import { Auth, signOut, User as AuthUser, getAuth as getAuthFromFirebase, onAuth
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 import { useEffect } from 'react';
-import { firebaseConfig } from '../../infrastructure/firebase/firebaseConfig';
 import { getAuthentication } from '@/app/service/authentication';
+import { userCredential } from '@/app/service/credential';
+
+const { removeCredentialStorage } = userCredential();
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
     const logout = async () => {
-        // const app = firebase.initializeApp(firebaseConfig);
-        // const auth = getAuthFromFirebase(app);
         // TODO: remove session storage
         const auth = getAuthentication();
         await signOut(auth);
+        removeCredentialStorage();
     };
 
     useEffect(() => {
-        // const app = firebase.initializeApp(firebaseConfig);
-        // const auth = getAuthFromFirebase(app);
+
         const auth = getAuthentication();
 
         firebase.auth().onAuthStateChanged((user) => {
             console.log('authentication');
             if (user != null) {
                 // TODO: add session storage or local storage
-                //setAuthUser(user);
                 if (user.emailVerified == false) {
                     console.log('send verify mail');
                     console.log(user);
@@ -37,7 +36,6 @@ export default function LoginPage() {
                 } else {
                     console.log('success login');
                     console.log(user);
-                    // TODO:register sessiom storage
                 }
             } else {
                 console.log('not registered');
@@ -57,7 +55,7 @@ export default function LoginPage() {
                     document.getElementById('loader')!.style.display = 'none';
                 },
             },
-            signInSuccessUrl: '/login', // This is where should redirect if the sign in is successful.
+            signInSuccessUrl: '/', // This is where should redirect if the sign in is successful.
             signInOptions: [
                 // This array contains all the ways an user can authenticate in your application. For this example, is only by email.
                 {

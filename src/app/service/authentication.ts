@@ -4,10 +4,10 @@ import firebase from 'firebase/compat/app';
 import { Auth, User as AuthUser, getAuth as getAuthFromFirebase, onAuthStateChanged } from 'firebase/auth';
 import { firebaseConfig } from '../infrastructure/firebase/firebaseConfig';
 
-// export const getAuth = () => {
-//     const app = initializeApp(firebaseConfig);
-//     return getAuthFromFirebase(app);
-// };
+// services
+import { userCredential } from '@/app/service/credential';
+
+const { getCredentialStorage, setCredentialStorage } = userCredential();
 
 export const getAuthentication = () => {
     const app = firebase.initializeApp(firebaseConfig);
@@ -15,30 +15,33 @@ export const getAuthentication = () => {
     return auth;
 };
 
-export const authInitialize = (setAuthUser: (user: AuthUser) => void, paramAuth?: Auth) => {
+export const authInitialize = (paramAuth?: Auth) => {
     const auth = paramAuth || getAuthentication();
 
     onAuthStateChanged(auth, (user) => {
-        // console.log('start onAuthStateChanged');
         if (user) {
-            // User is signed in, see docs for a list of available properties
-            // https://firebase.google.com/docs/reference/js/auth.user
-            // const uid = user.uid;
             console.log('onAuthStateChanged: userGet');
-            // console.log(user);
-            setAuthUser(user);
+            // TODO: change secure code
+            const userCredential = getCredentialStorage();
+            if (userCredential == null || user.uid != userCredential.uid) {
+                setCredentialStorage({
+                    uid: user.uid,
+                    isLogin: isLogin(user),
+                });
+            }
         }
     });
 };
 
 export const isLogin = (user: AuthUser | null | undefined) => {
     if (user === null || user === undefined) {
-        console.log('step1');
         return false;
     } else if (user.uid && user.emailVerified == true) {
-        console.log('step2');
         return true;
     }
-    console.log('step3');
     return false;
 };
+
+export const getCredential = () => {
+    return getCredentialStorage();
+}

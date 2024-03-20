@@ -4,3 +4,8 @@ type User = {
     name: string;
     life: number;
 };
+
+type UserCredential = {
+    uid: string;
+    isLogin: boolean;
+};
