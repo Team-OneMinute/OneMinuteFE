@@ -41,6 +41,11 @@ export default function UserPage() {
         );
     };
 
+    const logoutClick = () => {
+        logout();
+        router.push('/');
+    }
+
     return (
         <>
             <Background>
@@ -49,7 +54,7 @@ export default function UserPage() {
                     <>
                         <HeaderArea>
                             <LogoutButtonArea>
-                                <ButtonBase text='Logout' onClick={logout} />
+                                <ButtonBase text='Logout' onClick={logoutClick} />
                             </LogoutButtonArea>
                         </HeaderArea>
                         <MainArea>
