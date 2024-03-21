@@ -32,25 +32,15 @@ export default function UserPage() {
         })();
     }, []);
 
-    const suggestLoginModal = () => {
-        return (
-            <>
-                <div> not login now</div>
-                <div onClick={() => router.push('/user')}> login page</div>
-            </>
-        );
-    };
-
     const logoutClick = () => {
         logout();
         router.push('/');
-    }
+    };
 
     return (
         <>
             <Background>
-                {isLogin === false && suggestLoginModal()}
-                {isLogin && (
+                {isLogin ? (
                     <>
                         <HeaderArea>
                             <LogoutButtonArea>
@@ -73,6 +63,11 @@ export default function UserPage() {
                         <HistoryArea>
                             <SubTitle>History</SubTitle>
                         </HistoryArea>
+                    </>
+                ) : (
+                    <>
+                        <div> not login now</div>
+                        <div onClick={() => router.push('/user')}> login page</div>
                     </>
                 )}
             </Background>

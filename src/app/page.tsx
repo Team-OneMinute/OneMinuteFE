@@ -55,9 +55,10 @@ export default function App() {
 
         const gameList = await getAllActiveGames();
         const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount);
-        await setGames(sortedGameList);
-        if (games.length > 0) {
-            setSelectedGameId(games[0].gameId);
+        setGames(sortedGameList);
+		if (sortedGameList.length > 0) {
+            console.log('aaaa');
+            setSelectedGameId(sortedGameList[0].gameId);
         }
 
         setInitialized(true);
@@ -78,8 +79,8 @@ export default function App() {
 
             // FIXME:ユーザ認証ができるまで、userId固定
             // firebase function ができたら、コメント消して処理消す
-            // if (credential) {
-            //     const userData = await getUser(credential.uid);
+            // if (tmpCredential) {
+            //     const userData = await getUser(tmpCredential.uid);
             //     await setUser(userData);
             // }
             const userId = '0001A';
@@ -104,13 +105,6 @@ export default function App() {
     useEffect(() => {
         afterInitialized();
     }, [initialized]);
-
-    // TODO: いるかこれ
-    useEffect(() => {
-        if (games.length > 0) {
-            setSelectedGameId(games[0].gameId);
-        }
-    }, [games]);
 
     useEffect(() => {
         (async () => {

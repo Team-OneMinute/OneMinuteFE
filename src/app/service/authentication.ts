@@ -5,9 +5,11 @@ import { Auth, signOut, User as AuthUser, getAuth as getAuthFromFirebase, onAuth
 import { firebaseConfig } from '@/app/infrastructure/firebase/firebaseConfig';
 
 // services
-import { userCredential } from '@/app/service/credential';
-
-const { getCredentialStorage, setCredentialStorage, removeCredentialStorage } = userCredential();
+import {
+    getCredentialStorage,
+    setCredentialStorage,
+    removeCredentialStorage,
+} from '@/app/service/credential';
 
 export const getAuthentication = () => {
     const app = firebase.initializeApp(firebaseConfig);
@@ -33,22 +35,15 @@ export const authInitialize = (paramAuth?: Auth) => {
     });
 };
 
-export const isLoginSuccess = (user: AuthUser | null | undefined) => {
-    if (user === null || user === undefined) {
-        return false;
-    } else if (user.uid && user.emailVerified == true) {
-        return true;
-    }
-    return false;
+export const isLoginSuccess = (user: AuthUser): boolean => {
+    return !!(user.uid && user.emailVerified == true);
 };
 
 export const isLoginCheck = (credential: UserCredential | undefined) => {
-    if (credential === null || credential === undefined) {
+    if (!credential) {
         return false;
-    } else if (credential.isLogin === true) {
-        return true;
     }
-    return false;
+    return credential.isLogin;
 };
 
 export const getCredential = () => {

@@ -10,7 +10,6 @@ import 'firebaseui/dist/firebaseui.css';
 
 // services
 import { getAuthentication, logout } from '@/app/service/authentication';
-import { userCredential } from '@/app/service/credential';
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
@@ -19,6 +18,7 @@ export default function LoginPage() {
         const auth = getAuthentication();
         firebase.auth().onAuthStateChanged((user) => {
             console.log('authentication');
+            console.log(user);
             if (user != null) {
                 // TODO: add session storage or local storage
                 if (user.emailVerified == false) {
