@@ -10,10 +10,11 @@ import 'firebaseui/dist/firebaseui.css';
 
 // services
 import { getAuthentication, logout } from '@/app/service/authentication';
+import { useRouter } from 'next/navigation';
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
-
+    const router = useRouter();
     useEffect(() => {
         const auth = getAuthentication();
         firebase.auth().onAuthStateChanged((user) => {
@@ -70,6 +71,7 @@ export default function LoginPage() {
             // TODO: change loading image
             <div id='loader'>Now Loading...</div>
             <div onClick={() => logout()}> log out </div>
+            <div onClick={() => router.push('/selectCharacter')}> select character </div>
         </Background>
     );
 }
