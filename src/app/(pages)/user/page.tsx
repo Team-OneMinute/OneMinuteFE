@@ -15,6 +15,11 @@ export default function UserPage() {
     const [user, setUser] = useState<User>();
     const [isLogin, setIsLogin] = useState<boolean>(false);
 
+    // tmp
+    const mail = 'takeuma.com@example.com';
+    const apiKey =
+        'ck_staging_5ixm3ij57utqcHuAKtiWyJEbFgZUnbd91xHKbB7cEVX5CpPz7dF6H6xGvxbjpX7Tn1yAB67fdEev2fEfRhzBRPWtuVAKLtbvBkH9d9rgv7ChKf8QM6dHsQuw1CTUfsByUEi4Zh6cfm76GCxVJHM23pSxHFp7Dv7QoqwVSn8EMAWPi1CZ5kHdcBitUHxUunHzpv5v32oKenHxfzpw7jk8s8jc';
+
     useEffect(() => {
         const credential = getCredential();
         setIsLogin(isLoginCheck(credential));
@@ -32,6 +37,25 @@ export default function UserPage() {
         })();
     }, []);
 
+    const getNftData = () => {
+        console.log("fetch start");
+        const options = {
+            method: 'GET',
+            headers: {
+                'X-API-KEY':
+                    'ck_staging_5ixm3ij57utqcHuAKtiWyJEbFgZUnbd91xHKbB7cEVX5CpPz7dF6H6xGvxbjpX7Tn1yAB67fdEev2fEfRhzBRPWtuVAKLtbvBkH9d9rgv7ChKf8QM6dHsQuw1CTUfsByUEi4Zh6cfm76GCxVJHM23pSxHFp7Dv7QoqwVSn8EMAWPi1CZ5kHdcBitUHxUunHzpv5v32oKenHxfzpw7jk8s8jc',
+            },
+        };
+
+        fetch(
+            'https://staging.crossmint.com/api/2022-06-09/wallets/email%3Atakeuma.com%40example.com%3Azkatana/nfts?page=1&perPage=20',
+            options
+        )
+            .then((response) => response.json())
+            .then((response) => console.log(response))
+            .catch((err) => console.error(err));
+    };
+
     const logoutClick = () => {
         logout();
         router.push('/');
@@ -48,7 +72,7 @@ export default function UserPage() {
                             </LogoutButtonArea>
                         </HeaderArea>
                         <MainArea>
-                            <ImgArea src='/static/images/temp/User4.png'></ImgArea>
+                            <ImgArea src='/static/images/temp/character/character0.png'></ImgArea>
                             <InfoArea>
                                 <SubTitle>Name</SubTitle>
                                 <Text>Bob</Text>
@@ -63,6 +87,7 @@ export default function UserPage() {
                         <HistoryArea>
                             <SubTitle>History</SubTitle>
                         </HistoryArea>
+                        <div onClick={() => getNftData()}>data fetch</div>
                     </>
                 ) : (
                     <>
