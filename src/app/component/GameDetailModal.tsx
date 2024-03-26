@@ -134,22 +134,23 @@ const Content = styled.div`
     background-color: white;
     box-sizing: border-box;
     border-radius: 8vmin;
-    height: 50vh;
     text-align: center;
     position: fixed;
-    top: 50vh;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    min-width: 80vmin;
+    height: 50%;
+    width: 80%;
+    top: 25%;
+    left: 10%;
+    display: flex;
+    flex-direction: column;
     z-index: 11;
 `;
 
 const UserLife = styled.div``;
 
 const PlayButtonArea = styled.div`
-    position: fixed;
-    bottom: 10%;
     display: flex;
+    margin-bottom: 10%;
+    margin-top: auto;
 `;
 
 export default GameDetailModal;

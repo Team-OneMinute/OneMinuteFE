@@ -11,6 +11,7 @@ const NftPurchaseModal: React.FC<Props> = ({ closeModal }) => {
     const projectId = '412da5ae-a860-4cb3-9969-55948e5c327f';
     const collectionId = 'a221d4ac-0f9a-4205-bc61-a7816c5963ea';
     const environment = 'staging';
+    const myWalletAddress = '0xc3cc08915c82a24968dff3c00f81238b3749ea00'; // TODO: Crossmintのwalletアドレスを取得して渡すようにする
 
     return (
         <Overlay onClick={(e) => e.target === e.currentTarget && closeModal()}>
@@ -18,6 +19,7 @@ const NftPurchaseModal: React.FC<Props> = ({ closeModal }) => {
                 <InfoArea>Can't play not buy nft</InfoArea>
                 <PaymentButtonArea>
                     <CrossmintPayButton
+                        mintTo={myWalletAddress}
                         projectId={projectId}
                         collectionId={collectionId}
                         environment={environment}
@@ -25,6 +27,7 @@ const NftPurchaseModal: React.FC<Props> = ({ closeModal }) => {
                             type: 'erc-721',
                             totalPrice: '0.0003',
                         }}
+                        onClick={() => false}
                     />
                 </PaymentButtonArea>
             </Content>
