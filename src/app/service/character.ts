@@ -1,4 +1,5 @@
-import { mintNft } from "../infrastructure/crossmint/nft";
+// infrastructure
+import { mintNft, getMyNft } from '@/app/infrastructure/crossmint/nft';
 
 export const selectCharacter = async (id: string, email: string) => {
     const imageUrl = getCharacterImageUrl(id);
@@ -21,4 +22,8 @@ const getCharacterImageUrl = (id: string) => {
         default:
             return 'https://picsum.photos/400'; // TODO: 通常あり得ないルートなので、厳密性チェックを入れる
     }
+};
+
+export const getMyCharacter = (mailAddress: string) => {    
+    return getMyNft(mailAddress);
 };
