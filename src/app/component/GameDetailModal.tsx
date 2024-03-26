@@ -19,15 +19,35 @@ interface props {
     user: User | null;
     closeDetailModal: () => void;
     selectedGameId: string | null;
+    hasLifeNft: boolean;
+    togglePurchaseModal: () => void;
 }
 
-const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDetailModal, selectedGameId }) => {
+const GameDetailModal: React.FC<props> = ({
+    game,
+    rankings,
+    pools,
+    user,
+    closeDetailModal,
+    selectedGameId,
+    hasLifeNft,
+    togglePurchaseModal,
+}) => {
     //TODO: Top-ranking user can not update ranking. Should tell the user.
 
     const router = useRouter();
     if (!selectedGameId || pools.length == 0 || !user) {
         return;
     }
+
+    const hasLife = user.life > 0;
+    const onClickPlayButton = async () => {
+        if (hasLife && hasLifeNft) {
+            await clickPlay();
+        } else {
+            togglePurchaseModal();
+        }
+    };
 
     const clickPlay = async () => {
         console.log(user.docNo);
@@ -65,7 +85,7 @@ const GameDetailModal: React.FC<props> = ({ game, rankings, pools, user, closeDe
                 </UserLife>
                 <PlayButtonArea>
                     <PlayButton onClick={() => router.push(`/play?id=${selectedGameId}`)}>Free Play</PlayButton>
-                    <PlayButton onClick={() => clickPlay()}>Play</PlayButton>
+                    <PlayButton onClick={() => onClickPlayButton()}>Play</PlayButton>
                 </PlayButtonArea>
             </Content>
         </Overlay>
@@ -114,22 +134,23 @@ const Content = styled.div`
     background-color: white;
     box-sizing: border-box;
     border-radius: 8vmin;
-    height: 50vh;
     text-align: center;
     position: fixed;
-    top: 50vh;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    min-width: 80vmin;
+    height: 50%;
+    width: 80%;
+    top: 25%;
+    left: 10%;
+    display: flex;
+    flex-direction: column;
     z-index: 11;
 `;
 
 const UserLife = styled.div``;
 
 const PlayButtonArea = styled.div`
-    position: fixed;
-    bottom: 10%;
     display: flex;
+    margin-bottom: 10%;
+    margin-top: auto;
 `;
 
 export default GameDetailModal;
