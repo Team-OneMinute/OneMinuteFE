@@ -23,6 +23,7 @@ import AllGamesSlide from './slides/AllGameSlide';
 import GameGenreSlide from './slides/GameGenreSlide';
 import { getGameScoreForObj } from './service/score';
 import GameDetailModal from './component/GameDetailModal';
+import NftPurchaseModal from './component/NftPurchaseModal';
 
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
@@ -35,6 +36,7 @@ export default function App() {
     const [user, setUser] = useState<User | null>(null);
     const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
     const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
+    const [isOpenPurchaseModal, setIsOpenPurchaseModal] = useState<boolean>(false);
     const [credential, setCredential] = useState<UserCredential | null>(null);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
@@ -48,7 +50,11 @@ export default function App() {
 
     const closeDetailModal = useCallback(() => {
         setIsOpenDetailModal(false);
-    }, []);
+	}, []);
+
+	const togglePurchaseModal = useCallback(() => {
+		setIsOpenPurchaseModal(!isOpenPurchaseModal);
+	}, []);
 
     const topPageInitialized = async (): Promise<void> => {
         authInitialize();
@@ -202,8 +208,11 @@ export default function App() {
                             user={user}
                             closeDetailModal={closeDetailModal}
                             selectedGameId={selectedGameId}
+                            hasLifeNft={false} // TODO: ユーザーがNFTを持っているかの判定
+                            togglePurchaseModal={togglePurchaseModal}
                         />
                     )}
+                    {isOpenPurchaseModal && <NftPurchaseModal closeModal={() => togglePurchaseModal()} />}
                 </>
             )}
         </>
