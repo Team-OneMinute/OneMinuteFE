@@ -1,7 +1,11 @@
 'use client';
+import { ButtonBase } from '@/app/component/Atoms/Button';
+import { selectCharacter } from '@/app/service/character';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+// TODO: NFTを持っていない人が絶対にここの画面に来ないようにする
+// TODO: ↑フロント、バックエンドの両方をチェックしないといけない
 export default function SelectCharacterPage() {
     const [selectedImgID, setSelectedGameId] = useState<number>(0);
     const characterNum = 4;
@@ -42,6 +46,12 @@ export default function SelectCharacterPage() {
                 <InActiveCharacterImageArea>{selectableCharacter()}</InActiveCharacterImageArea>
                 <ActiveCharacterImageArea>{selectedCharacter()}</ActiveCharacterImageArea>
             </CharacterImageArea>
+            <ButtonArea>
+                <ButtonBase
+                    text='I Choose You !'
+                    onClick={() => selectCharacter(String(selectedImgID), 'takeuma.com@example.com')}
+                />
+            </ButtonArea>
             <InfoArea>
                 <InfoText>character info</InfoText>
             </InfoArea>
@@ -59,13 +69,14 @@ const Background = styled.div`
 const HeaderArea = styled.div`
     width: 100%;
     height: 10%;
+    padding: 5% 2%;
+    margin-bottom: 5%;
 `;
 
 const TitleArea = styled.div`
     text-align: center;
     width: 100%;
     height: 100%;
-    margin: 5%;
 `;
 
 const Title = styled.text`
@@ -105,7 +116,19 @@ const ActiveCharacterImage = styled.img`
 
 const InfoArea = styled.div`
     width: 100%;
-    height: 30%;
+    height: 15%;
 `;
 
-const InfoText = styled.div``;
+const InfoText = styled.div`
+    display: flex;
+    justify-content: center;
+    color: #fff;
+`;
+
+const ButtonArea = styled.div`
+    width: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    padding: 3% 20%;
+`;
