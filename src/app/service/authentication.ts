@@ -20,6 +20,7 @@ export const getAuthentication = () => {
 export const authInitialize = (paramAuth?: Auth) => {
     const auth = paramAuth || getAuthentication();
 
+    // get user credential from firebase authentication
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log('onAuthStateChanged: userGet');
