@@ -8,6 +8,7 @@ import { decrementLife } from '@/app/service/user';
 import { setTransaction } from '@/app/service/gameTransaction';
 import { addScoreDocument, getMyGameScore } from '@/app/service/score';
 import { betFee } from '@/app/service/bet';
+import { playGame } from '@/app/service/game';
 
 // components
 // import { CountDownMovie } from "@/app/component/countdownMovie";
@@ -42,11 +43,13 @@ const GameDetailModal: React.FC<props> = ({
 
     const hasLife = user.life > 0;
     const onClickPlayButton = async () => {
-        if (hasLife && hasLifeNft) {
-            await clickPlay();
-        } else {
-            togglePurchaseModal();
-        }
+        const response = await playGame(user.userId);
+        console.log(response);
+        // if (hasLife && hasLifeNft) {
+        //     await clickPlay();
+        // } else {
+        //     togglePurchaseModal();
+        // }
     };
 
     const clickPlay = async () => {
