@@ -32,7 +32,7 @@ export const getAllActiveGames = async () => {
     return gameList;
 };
 
-export const playGame = (uid: string) => {
+export const playGame = async (uid: string) => {
     const response = play(uid);
     return response;
 }

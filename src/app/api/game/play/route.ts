@@ -6,6 +6,11 @@ import { getFirestore } from 'firebase-admin/firestore';
 //import serviceAccount from './firebase-stg-service-account.json';
 const serviceAccount = require('./firebase-stg-service-account.json');
 
+const ENV = 'staging';
+const CHAIN = 'zkatana';
+const API_KEY =
+    'sk_staging_2552NTfz81CkBiSQs3exGvkQcxBXmKGSNy2S4DG6GHtDjZ334mTk59bwtCajbyeg9BBGiy8im6ApZCAV7QcoFWeENHB2EmER1MXvcdZCNQpcaumR4drkjRhvVYKBwkKFUkMKqtGBzVC2mYiWc4FiUdRgcwxaE4bFkMvicDRjXpysgW1nBUQSbefW2BEZeHTh1G4MKvm8eiUE3uL4M98shyd';
+const COLLECTION_ID = '1b9cd598-90aa-4cdf-86b8-a0479c5a1ad2';
 
 interface PostParameters {
     uid: string;
@@ -17,40 +22,31 @@ enum ResponseCode {
     LifeIsZero = '0002',
 }
 
-export const POST = async (req: NextRequest) => {
-        initializeApp({
-            credential: cert(serviceAccount),
-        });
-    const { uid } = (await req.json()) as PostParameters;
-    const userRef = await getFirestore().collection("users").doc(uid).get();
-    const useSnap = await userRef.data();
-    const userData = JSON.parse(String(useSnap));
+initializeApp({
+    credential: cert(serviceAccount),
+});
 
-    // const userData = useSnap!.map((data:
-    //     {
-    //         user_id: string;
-    //         name: string;
-    //         life: number;
-    //         claimable_reward: number;
-    //         total_claimed: number;
-    //         mail_address: string;
-    //         purchased_nft_flg: boolean;
-    //     }) => {
-    //     return {
-    //         userId: String(data.user_id),
-    //         name: String(data.name),
-    //         life: Number(data.life),
-    //         claimableReward: Number(data.claimable_reward),
-    //         totalClaimed: Number(data.total_claimed),
-    //         mailAddress: String(data.mail_address),
-    //         purchasedNftFlg: Boolean(data.purchased_nft_flg),
-    //     } as User;
-    // });
+export const POST = async (req: NextRequest) => {
+    const { uid } = (await req.json()) as PostParameters;
+    const userRef = await getFirestore().collection('users').doc(uid).get();
+    const useSnap = await userRef.data();
+
+    const userData: User = {
+        docNo: String(useSnap!.user_id),
+        userId: String(useSnap!.user_id),
+        name: String(useSnap!.name),
+        life: Number(useSnap!.life),
+        claimableReward: Number(useSnap!.claimable_reward),
+        totalClaimed: Number(useSnap!.total_claimed),
+        mailAddress: String(useSnap!.mail_address),
+        purchasedNftFlg: Boolean(useSnap!.purchased_nft_flg),
+    };
 
     if (userData.purchasedNftFlg == false) {
         console.log("not exist nft data firebase");
         //fetch nft
-        const nftData = true;
+        // const nftData = fetchNft(userData.mailAddress);
+        const nftData = fetchNft('takeuma.com@example.com');
         if (nftData == true) {
             // set user life & flg
             console.log('not exist nft data firebase, but exist crossmint');
@@ -78,4 +74,38 @@ export const POST = async (req: NextRequest) => {
 
 const addTransaction = () => {
     console.log("add transaction");
+};
+
+const fetchNft = (email: string) => {
+    // fetch nft in wallet from email
+    const baseHeadURL = 'https://staging.crossmint.com/api/2022-06-09/wallets/';
+    const baseTailURL = '/nfts?page=1&perPage=20';
+    const encodedColon = '%3A';
+    const encodedMailAddress = emailUrlEncode(email);
+
+    const encodedPath = `${baseHeadURL}email${encodedColon}${encodedMailAddress}${encodedColon}${CHAIN}${baseTailURL}`;
+    //const fullPathBeforeEncode = `${baseHeadURL}email:${encodedMailAddress}:${chain}${baseTailURL}`;
+
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-API-KEY': API_KEY,
+        },
+    };
+
+    const nfts = fetch(encodedPath, options)
+        .then((response) => response.json())
+        .then((response) => {
+            console.log(response);
+            return response;
+        })
+        .catch((err) => console.error(err));
+    // console.log(nfts);
+    return true;
+}
+
+const emailUrlEncode = (mail: string) => {
+    const splitStr = mail.split('@');
+    const encodedMailAddress = splitStr[0] + '%40' + splitStr[1];
+    return encodedMailAddress;
 };
