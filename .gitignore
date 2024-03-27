@@ -43,3 +43,6 @@ next-env.d.ts
 
 # config
 firebaseConfig.ts
+
+# service accounts
+firebase-stg-service-account.json
