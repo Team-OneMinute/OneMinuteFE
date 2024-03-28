@@ -1,4 +1,4 @@
-import { getFirestore, FieldValue, DocumentData } from 'firebase-admin/firestore';
+import { getFirestore, DocumentData } from 'firebase-admin/firestore';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 
 const serviceAccount = require('./firebase-stg-service-account.json');
@@ -17,4 +17,9 @@ export const getSnapByDocKey = async (collectionId: string, docId: string) => {
 export const addDocument = async (collectionId: string, docId: string, data: DocumentData) => {
     const writeResult = await getFirestore().collection(collectionId).doc(docId).create(data);
     console.log(writeResult);
+};
+
+export const updateDocument = async (collectionId: string, docId: string, updateData: any) => {
+    const updateResult = await getFirestore().collection(collectionId).doc(docId).update(updateData);;
+    return updateResult;
 };
