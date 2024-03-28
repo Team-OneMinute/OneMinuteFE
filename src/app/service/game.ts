@@ -32,8 +32,8 @@ export const getAllActiveGames = async () => {
     return gameList;
 };
 
-export const playGame = async (uid: string) => {
-    const response = play(uid);
+export const playGame = async (uid: string, gameId: string) => {
+    const response = await play(uid, gameId);
     return response;
 }
 

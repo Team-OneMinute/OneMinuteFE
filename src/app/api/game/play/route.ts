@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // fire store
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 //import serviceAccount from './firebase-stg-service-account.json';
 const serviceAccount = require('./firebase-stg-service-account.json');
+
+// util
+import { dateFormatForString } from '@/app/utils/date';
 
 const ENV = 'staging';
 const CHAIN = 'zkatana';
@@ -16,6 +19,7 @@ const NFT_CONTRACT_ADDRESS_LIFE = '0x0FC4edC21C089714f5B8e5510D402865137f68e9';
 
 interface PostParameters {
     uid: string;
+    gameId: string;
 }
 
 enum ResponseCode {
@@ -24,12 +28,14 @@ enum ResponseCode {
     LifeIsZero = '0002',
 }
 
-initializeApp({
-    credential: cert(serviceAccount),
-});
+if (!getApps()?.length) {
+    initializeApp({
+        credential: cert(serviceAccount),
+    });
+}
 
 export const POST = async (req: NextRequest) => {
-    const { uid } = (await req.json()) as PostParameters;
+    const { uid, gameId } = (await req.json()) as PostParameters;
     const userRef = await getFirestore().collection('users').doc(uid).get();
     const useSnap = await userRef.data();
 
@@ -47,12 +53,12 @@ export const POST = async (req: NextRequest) => {
     if (userData.purchasedNftFlg == false) {
         console.log("not exist nft data firebase");
         //fetch nft
-        const nftData = await fetchNft(userData.mailAddress);
-        // const nftData = await fetchNft('takeuma.com@example.com');
+        // const nftData = await fetchNft(userData.mailAddress);
+        const nftData = await fetchNft('takeuma.com@example.com');
         if (hasLifeNft(nftData)) {
             // set user life & flg
             console.log('not exist nft data firebase, but exist crossmint');
-            addTransaction();
+            await addTransaction(uid, gameId);
             const responseCode = ResponseCode.Playable;
             return NextResponse.json(responseCode);
         } else {
@@ -68,14 +74,22 @@ export const POST = async (req: NextRequest) => {
     }
     console.log("exist nft and life");
     const transactionId = '';
-    addTransaction();
+    await addTransaction(uid, gameId);
 
     const responseCode = ResponseCode.Playable;
     return NextResponse.json(responseCode);
 };
 
-const addTransaction = () => {
-    console.log("add transaction");
+const addTransaction = async (userId: string, gameId: string) => {
+    console.log(`add transaction, gameId: ${gameId}`);
+    const now: string = dateFormatForString(new Date());
+    const collectionId = `${gameId}_game_transactions`;
+    const docId = `${gameId}_${userId}_${now}`;
+    const writeResult = await getFirestore().collection(collectionId).doc(docId).create({
+        start_date: FieldValue.serverTimestamp(),
+        user_id: userId,
+    });
+    console.log(writeResult);
 };
 
 const fetchNft = async (email: string) => {
