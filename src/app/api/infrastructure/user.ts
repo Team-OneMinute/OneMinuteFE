@@ -16,4 +16,4 @@ export const getUserData = async (uid: string) => {
         purchasedNftFlg: Boolean(userSnap!.purchased_nft_flg),
     };
     return userData;
-}
+};
