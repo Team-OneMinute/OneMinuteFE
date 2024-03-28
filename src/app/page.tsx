@@ -72,7 +72,7 @@ export default function App() {
         setInitialized(true);
     };
 
-    const afterInitialized = () => {
+    const afterInitialized = async () => {
         console.log('initialized started');
         if (initialized == true) {
             // credential init
@@ -83,20 +83,28 @@ export default function App() {
             if (tmpCredential != null) {
                 // TODO: log in dev environments only
                 setCredential(tmpCredential);
+
+                console.log("start user data fetch");
+                const userData = await getUser(tmpCredential.uid);
+                console.log('user');
+                console.log(userData);
+                await setUser(userData);
             }
 
-            // FIXME:ユーザ認証ができるまで、userId固定
-            // firebase function ができたら、コメント消して処理消す
-            // if (tmpCredential) {
+            //FIXME:ユーザ認証ができるまで、userId固定
+            //firebase function ができたら、コメント消して処理消す
+            // if (tmpCredential != null) (async () => {
             //     const userData = await getUser(tmpCredential.uid);
+            //     console.log("user");
+            //     console.log(userData);
             //     await setUser(userData);
-            // }
-            const userId = '0001A';
-            (async () => {
-                const userData = await getUser(userId);
-                await setUser(userData);
-                console.log(userData);
-            })();
+            // })
+            // const userId = '0001A';
+            // (async () => {
+            //     const userData = await getUser(userId);
+            //     await setUser(userData);
+            //     console.log(userData);
+            // })();
 
             // TODO: other game fetch and add store
             setLoading(false);

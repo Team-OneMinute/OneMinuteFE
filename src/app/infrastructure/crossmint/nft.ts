@@ -24,11 +24,8 @@ export const getMyNft = (mailAddress: string) => {
     const encodedColon = '%3A';
     const encodedMailAddress = emailUrlEncode(mailAddress);
 
-    const fullPathBeforeEncode = `${baseHeadURL}email${encodedColon}${encodedMailAddress}${encodedColon}${chain}${baseTailURL}`;
+    const encodedPath = `${baseHeadURL}email${encodedColon}${encodedMailAddress}${encodedColon}${chain}${baseTailURL}`;
     //const fullPathBeforeEncode = `${baseHeadURL}email:${encodedMailAddress}:${chain}${baseTailURL}`;
-    const encodedPath = encodeURI(fullPathBeforeEncode);
-
-    console.log(encodedPath);
 
     const options = {
         method: 'GET',
@@ -37,7 +34,7 @@ export const getMyNft = (mailAddress: string) => {
         },
     };
 
-    fetch(fullPathBeforeEncode, options)
+    fetch(encodedPath, options)
         .then((response) => response.json())
         .then((response) => {
             return response;

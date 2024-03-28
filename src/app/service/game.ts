@@ -1,6 +1,7 @@
-// firebase
+// infrastructure
 import { collection, query, orderBy, where, getDocs } from 'firebase/firestore';
 import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
+import { play } from '@/app/infrastructure/api/game';
 
 /**
  * Fetch active games limit number
@@ -30,6 +31,11 @@ export const getAllActiveGames = async () => {
     });
     return gameList;
 };
+
+export const playGame = async (uid: string, gameId: string) => {
+    const response = await play(uid, gameId);
+    return response;
+}
 
 const initialize = () => {
     return fireStoreInitialized();

@@ -5,6 +5,8 @@ type User = {
     life: number;
     claimableReward: number;
     totalClaimed: number;
+    mailAddress: string;
+    purchasedNftFlg: boolean;
 };
 
 type UserCredential = {
