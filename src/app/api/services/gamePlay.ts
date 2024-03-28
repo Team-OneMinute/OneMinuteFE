@@ -3,7 +3,7 @@ import { fetchNft } from '@/app/api/infrastructure/crossmint/nft/nft';
 import { addTransaction } from '@/app/api/infrastructure/transaction';
 
 // service
-import { getUser } from '@/app/api/services/user';
+import { getUser, setUserLifeAndPurchaseFlg } from '@/app/api/services/user';
 
 // entity
 import { CheckGamePlayStatus } from '@/app/api/entity/serviceCode';
@@ -17,10 +17,11 @@ export const checkPlay = async (uid: string) => {
     } else {
         // userData.purchasedNftFlg === false
         // DEV: debug code
-        //const nftData = await fetchNft('takeuma.com@example.com');
-        const nftData = await fetchNft(userData.mailAddress);
+        const nftData = await fetchNft('takeuma.com@example.com');
+        //const nftData = await fetchNft(userData.mailAddress);
         if (hasLifeNft(nftData)) {
             // TODO: set user life & flg
+            setUserLifeAndPurchaseFlg(uid);
             return CheckGamePlayStatus.OK;
         }
     }

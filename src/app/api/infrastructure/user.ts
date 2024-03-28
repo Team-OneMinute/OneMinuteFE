@@ -1,5 +1,5 @@
 // infrastructure
-import { getSnapByDocKey } from '@/app/api/infrastructure/firestore/firestore';
+import { getSnapByDocKey, updateDocument } from '@/app/api/infrastructure/firestore/firestore';
 
 const collectionId = 'users';
 
@@ -17,3 +17,8 @@ export const getUserData = async (uid: string) => {
     };
     return userData;
 };
+
+export const setUserData = (uid: string, updateUserData: any) => {
+    // TODO: add error handling
+    const result = updateDocument(collectionId, uid, updateUserData);
+}
