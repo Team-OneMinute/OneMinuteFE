@@ -4,34 +4,24 @@ import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 
 // services
-import { decrementLife } from '@/app/service/user';
-import { setTransaction } from '@/app/service/gameTransaction';
-import { addScoreDocument, getMyGameScore } from '@/app/service/score';
-import { betFee } from '@/app/service/bet';
+import { getMyGameScore } from '@/app/service/score';
 import { playGame } from '@/app/service/game';
-
-// components
-// import { CountDownMovie } from "@/app/component/countdownMovie";
 
 interface props {
     game: Game;
-    rankings: Score[];
     pools: Pool[];
     user: User | null;
     closeDetailModal: () => void;
     selectedGameId: string | null;
-    hasLifeNft: boolean;
     togglePurchaseModal: () => void;
 }
 
 const GameDetailModal: React.FC<props> = ({
     game,
-    rankings,
     pools,
     user,
     closeDetailModal,
     selectedGameId,
-    hasLifeNft,
     togglePurchaseModal,
 }) => {
     //TODO: Top-ranking user can not update ranking. Should tell the user.
@@ -41,16 +31,16 @@ const GameDetailModal: React.FC<props> = ({
         return;
     }
 
-    const hasLife = user.life > 0;
     const onClickPlayButton = async () => {
         const response = await playGame(user.userId, game.gameId);
         console.log(response);
-        await clickPlay();
-        // if (response.responseCode == '0000') {
-        //     await clickPlay();
-        // } else {
-        //     togglePurchaseModal();
-        // }
+        if (response == '0000') {
+            await clickPlay();
+        } else if (response == '0001') {
+            togglePurchaseModal();
+        } else {
+            console.log("buy portion");
+        }
     };
 
     const clickPlay = async () => {
@@ -60,17 +50,10 @@ const GameDetailModal: React.FC<props> = ({
         // set new User Score (0)
         let prevScore = 0;
         if (scoreData.length == 0) {
-            await addScoreDocument(selectedGameId, user.userId, 0); // TODO: migration firebase function
             prevScore = 0;
         } else {
             prevScore = scoreData[0].score;
         }
-        // bet fee
-        // betFee();
-        // decrement user life -1
-        // await decrementLife(user.docNo);
-        // add gameTransaction
-        // await setTransaction(selectedGameId, user.userId);
 
         // move play page
         router.push(`/play?id=${selectedGameId}&score=${prevScore}`);

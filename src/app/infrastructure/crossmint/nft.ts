@@ -10,9 +10,6 @@ export const mintNft = async (id: string, email: string, imageUrl: string) => {
             imageUrl: imageUrl,
         }),
     });
-    // const data = response.json().then((value) => {
-    //     console.log(value);
-    // });
 };
 
 export const getMyNft = (mailAddress: string) => {
@@ -25,7 +22,6 @@ export const getMyNft = (mailAddress: string) => {
     const encodedMailAddress = emailUrlEncode(mailAddress);
 
     const encodedPath = `${baseHeadURL}email${encodedColon}${encodedMailAddress}${encodedColon}${chain}${baseTailURL}`;
-    //const fullPathBeforeEncode = `${baseHeadURL}email:${encodedMailAddress}:${chain}${baseTailURL}`;
 
     const options = {
         method: 'GET',

@@ -1,13 +1,24 @@
 'use client';
-import { ButtonBase } from '@/app/component/Atoms/Button';
-import { selectCharacter } from '@/app/service/character';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+
+// service
+import { ButtonBase } from '@/app/component/Atoms/Button';
+import { getCredential } from '@/app/service/authentication';
+import { selectCharacter } from '@/app/service/character';
+import { getUser } from '@/app/service/user';
+import { useRouter } from 'next/navigation';
+
+// component
+import { SelectedCharacterModal } from '@/app/component/SelectedCharacterModal';
 
 // TODO: NFTを持っていない人が絶対にここの画面に来ないようにする
 // TODO: ↑フロント、バックエンドの両方をチェックしないといけない
 export default function SelectCharacterPage() {
+    const router = useRouter();
     const [selectedImgID, setSelectedGameId] = useState<number>(0);
+    const [user, setUser] = useState<User | null>(null);
+    const [submitCharacter, setSubmitCharacter] = useState<boolean>(false);
     const characterNum = 4;
 
     const tmpPathHead = '/static/images/temp/character/character';
@@ -17,12 +28,24 @@ export default function SelectCharacterPage() {
         setSelectedGameId(selectID);
     };
 
-    const selectableCharacter = () => {
+    const fetchUser = async () => {
+        const userCredential = getCredential();
+        if (userCredential === undefined || userCredential === null) {
+            router.push('/');
+        }
+        const userData = await getUser(userCredential!.uid);
+        setUser(userData);
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
+    // TODO: NFTミントしたらモーダル出して、ログイン遷移作る
+    const inActiveCharacter = () => {
         const imgList = [];
         for (let i = 0; i < characterNum; i++) {
             if (i != selectedImgID) {
-                console.log(i);
-                console.log(selectedImgID);
                 const fullPath = `${tmpPathHead}${i}${tmpPathTail}`;
                 imgList.push(<InActiveCharacterImage src={fullPath} onClick={() => onClickImg(i)} />);
             }
@@ -30,9 +53,18 @@ export default function SelectCharacterPage() {
         return imgList;
     };
 
-    const selectedCharacter = () => {
+    const activeCharacter = () => {
         const fullPath = `${tmpPathHead}${selectedImgID}${tmpPathTail}`;
         return <ActiveCharacterImage src={fullPath} />;
+    };
+
+    const selectedCharacter = () => {
+        setSubmitCharacter(true);
+        selectCharacter(String(selectedImgID), user!.mailAddress);
+    };
+
+    const modalOnclickHandler = () => {
+        router.push('/');
     };
 
     return (
@@ -43,18 +75,22 @@ export default function SelectCharacterPage() {
                 </TitleArea>
             </HeaderArea>
             <CharacterImageArea>
-                <InActiveCharacterImageArea>{selectableCharacter()}</InActiveCharacterImageArea>
-                <ActiveCharacterImageArea>{selectedCharacter()}</ActiveCharacterImageArea>
+                <InActiveCharacterImageArea>{inActiveCharacter()}</InActiveCharacterImageArea>
+                <ActiveCharacterImageArea>{activeCharacter()}</ActiveCharacterImageArea>
             </CharacterImageArea>
             <ButtonArea>
-                <ButtonBase
-                    text='I Choose You !'
-                    onClick={() => selectCharacter(String(selectedImgID), 'takeuma.com@example.com')}
-                />
+                <ButtonBase text='I Choose You !' onClick={() => selectedCharacter()} />
             </ButtonArea>
             <InfoArea>
                 <InfoText>character info</InfoText>
             </InfoArea>
+            {submitCharacter == true && (
+                <SelectedCharacterModal
+                    title='Congratulation'
+                    explanation='Character creating... wait a minute'
+                    onClickHandler={modalOnclickHandler}
+                />
+            )}
         </Background>
     );
 }

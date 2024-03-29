@@ -26,6 +26,7 @@ import { getGameScoreForObj } from './service/score';
 // components
 import GameDetailModal from './component/GameDetailModal';
 import NftPurchaseModal from './component/NftPurchaseModal';
+import { ButtonBase } from '@/app/component/Atoms/Button';
 
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
@@ -91,21 +92,6 @@ export default function App() {
                 await setUser(userData);
             }
 
-            //FIXME:ユーザ認証ができるまで、userId固定
-            //firebase function ができたら、コメント消して処理消す
-            // if (tmpCredential != null) (async () => {
-            //     const userData = await getUser(tmpCredential.uid);
-            //     console.log("user");
-            //     console.log(userData);
-            //     await setUser(userData);
-            // })
-            // const userId = '0001A';
-            // (async () => {
-            //     const userData = await getUser(userId);
-            //     await setUser(userData);
-            //     console.log(userData);
-            // })();
-
             // TODO: other game fetch and add store
             setLoading(false);
         }
@@ -146,13 +132,25 @@ export default function App() {
         return totalReward > 0 ? totalReward : 0;
     };
 
+    const selectCharacterClick = () => {
+        router.push('/selectCharacter');
+    }
+
     const loginUserHeaderArea = () => {
+        console.log(user?.purchasedNftFlg);
         return (
             // TODO: blockchain接続後、src入れかえ
-            <UserArea onClick={() => router.push('/user')}>
-                <UserNftImg src='/static/images/temp/tmpUser.png' />
-                <UserTotalAmount>{`${totalGetReward()}`}</UserTotalAmount>
-            </UserArea>
+            <>
+                <UserArea onClick={() => router.push('/user')}>
+                    <UserNftImg src='/static/images/temp/tmpUser.png' />
+                    <UserTotalAmount>{`${totalGetReward()}`}</UserTotalAmount>
+                </UserArea>
+                {user?.purchasedNftFlg == false && (
+                    <SelectCharacterButtonArea>
+                        <ButtonBase text='Select Character' onClick={selectCharacterClick} />
+                    </SelectCharacterButtonArea>
+                )}
+            </>
         );
     };
 
@@ -213,12 +211,10 @@ export default function App() {
                     {isOpenDetailModal && (
                         <GameDetailModal
                             game={games.find((game) => game.gameId == selectedGameId) || games[0]}
-                            rankings={rankings}
                             pools={pools}
                             user={user}
                             closeDetailModal={closeDetailModal}
                             selectedGameId={selectedGameId}
-                            hasLifeNft={false} // TODO: ユーザーがNFTを持っているかの判定
                             togglePurchaseModal={togglePurchaseModal}
                         />
                     )}
@@ -268,6 +264,10 @@ const UserTotalAmount = styled.div`
     font-size: 16px;
     font-weight: bold;
     color: #ffffff;
+`;
+
+const SelectCharacterButtonArea = styled.div`
+
 `;
 
 const LoginArea = styled.div`

@@ -16,11 +16,8 @@ export const checkPlay = async (uid: string) => {
         return CheckGamePlayStatus.LIFE_IS_ZERO;
     } else {
         // userData.purchasedNftFlg === false
-        // DEV: debug code
-        const nftData = await fetchNft('takeuma.com@example.com');
-        //const nftData = await fetchNft(userData.mailAddress);
+        const nftData = await fetchNft(userData.mailAddress);
         if (hasLifeNft(nftData)) {
-            // TODO: set user life & flg
             setUserLifeAndPurchaseFlg(uid);
             return CheckGamePlayStatus.OK;
         }
@@ -35,5 +32,6 @@ export const initializeGame = (uid: string, gameId: string) => {
 const hasLifeNft = (nfts: any[]) => {
     // TODO: into env file
     const NFT_CONTRACT_ADDRESS_LIFE = '0x0FC4edC21C089714f5B8e5510D402865137f68e9';
+    console.log(nfts);
     return nfts.some((nftData) => nftData.contractAddress == NFT_CONTRACT_ADDRESS_LIFE);
 };

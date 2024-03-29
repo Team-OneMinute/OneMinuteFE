@@ -23,6 +23,8 @@ export const getUser = async (userId: string) => {
             life: Number(data.life),
             claimableReward: Number(data.claimable_reward),
             totalClaimed: Number(data.total_claimed),
+            purchasedNftFlg: Boolean(data.purchased_nft_flg),
+            mailAddress: String(data.mail_address),
         } as User;
     });
 

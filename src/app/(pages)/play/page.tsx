@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '@/app/service/user';
 import { getGameScoreForSnapOrderScore, transferScoreObj, updateScoreByGameId } from '@/app/service/score';
 import { updateRanking, getBeforeRankingNo, getNewRankingNo, isUpRanking } from '@/app/service/ranking';
+import { getCredential } from '@/app/service/authentication';
 
 export default function GamePlayingPage() {
     // TODO: 右スワイプでTOP画面に戻れる問題あり
@@ -22,10 +23,11 @@ export default function GamePlayingPage() {
     const finalize = async (newScore: number) => {
         if (prevScore < newScore) {
             // TODO:認証ができるまでは一旦決め打ち。最終的にはstrage.uidからクレデンシャル引く
-            const userId = '0001A';
+            const credentials = getCredential();
+            const userId = credentials!.uid;
             // TODO: tmp score
             //const score = newScore;
-            const score = 9990;
+            const score = 9999;
 
             // fetch data
             const user = await getUser(userId);
