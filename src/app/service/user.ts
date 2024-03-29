@@ -24,6 +24,7 @@ export const getUser = async (userId: string) => {
             claimableReward: Number(data.claimable_reward),
             totalClaimed: Number(data.total_claimed),
             purchasedNftFlg: Boolean(data.purchased_nft_flg),
+            characterNftFlg: Boolean(data.character_nft_flg),
             mailAddress: String(data.mail_address),
         } as User;
     });
@@ -45,6 +46,14 @@ export const addClaimableReward = async (docNo: string, amount: number) => {
     await updateDoc(userRef, {
         claimable_reward: increment(amount),
     });
+};
+
+export const setCharacterFlgInUser = async (docNo: string) => {
+        const db = initialize();
+        const userRef = doc(db, 'users', docNo);
+        await updateDoc(userRef, {
+            characterNftFlg: true,
+        });
 };
 
 const initialize = () => {

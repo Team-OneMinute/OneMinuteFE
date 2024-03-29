@@ -7,6 +7,7 @@ type User = {
     totalClaimed: number;
     mailAddress: string;
     purchasedNftFlg: boolean;
+    characterNftFlg: boolean;
 };
 
 type UserCredential = {

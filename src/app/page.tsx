@@ -145,7 +145,7 @@ export default function App() {
                     <UserNftImg src='/static/images/temp/tmpUser.png' />
                     <UserTotalAmount>{`${totalGetReward()}`}</UserTotalAmount>
                 </UserArea>
-                {user?.purchasedNftFlg == false && (
+                {user?.characterNftFlg == false && (
                     <SelectCharacterButtonArea>
                         <ButtonBase text='Select Character' onClick={selectCharacterClick} />
                     </SelectCharacterButtonArea>

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { getCredential } from '@/app/service/authentication';
 import { selectCharacter } from '@/app/service/character';
-import { getUser } from '@/app/service/user';
+import { getUser, setCharacterFlgInUser } from '@/app/service/user';
 import { useRouter } from 'next/navigation';
 
 // component
@@ -59,6 +59,7 @@ export default function SelectCharacterPage() {
     };
 
     const selectedCharacter = () => {
+        setCharacterFlgInUser(user!.docNo);
         setSubmitCharacter(true);
         selectCharacter(String(selectedImgID), user!.mailAddress);
     };
