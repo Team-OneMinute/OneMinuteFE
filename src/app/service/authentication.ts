@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs
 import { initializeApp } from 'firebase/app';
 import firebase from 'firebase/compat/app';
-import { Auth, signOut, User as AuthUser, getAuth as getAuthFromFirebase, onAuthStateChanged } from 'firebase/auth';
+import { getIdToken, Auth, signOut, User as AuthUser, getAuth as getAuthFromFirebase, onAuthStateChanged, User } from 'firebase/auth';
 import { firebaseConfig } from '@/app/infrastructure/firebase/firebaseConfig';
 
 // services
@@ -10,6 +10,7 @@ import {
     setCredentialStorage,
     removeCredentialStorage,
 } from '@/app/service/credential';
+import { logoutWeb3Auth } from '../infrastructure/web3Auth/web3AuthConfig';
 
 export const getAuthentication = () => {
     const app = firebase.initializeApp(firebaseConfig);
@@ -55,5 +56,11 @@ export const logout = async () => {
     // TODO: remove session storage
     const auth = getAuthentication();
     await signOut(auth);
+    await logoutWeb3Auth();
     removeCredentialStorage();
+};
+
+export const getToken = async (user: User) => {
+    const token = await getIdToken(user, true);
+    return token;
 };
