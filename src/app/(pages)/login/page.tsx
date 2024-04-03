@@ -36,6 +36,7 @@ export default function LoginPage() {
     };
 
     const verifyCheck = () => {
+        router.push('/'); // FIXME: 最新のverifyの値取得できず、top画面に戻れないバグ発生中。画面更新なりをして最新のverifyの値を取得できるようにする。暫定対処として強制top画面遷移
         // verifyを取得
         const authUser = getAuthUser();
         const isVerify = authUser?.emailVerified;
