@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 // firebase
@@ -9,16 +9,18 @@ import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 
 // services
-import { getAuthentication, logout } from '@/app/service/authentication';
+import { getAuthUser, getAuthentication, logout } from '@/app/service/authentication';
 import { useRouter } from 'next/navigation';
 import { walletLogin } from '@/app/service/wallet';
 
 // tmp
-import { connectWeb3Auth } from '@/app/infrastructure/web3Auth/web3AuthConfig' 
+import { connectWeb3Auth } from '@/app/infrastructure/web3Auth/web3AuthConfig';
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
     const router = useRouter();
+    const [isLogin, setIsLogin] = useState<boolean>(false);
+    const [isFailedVerify, setIsFailedVerify] = useState<boolean>(false);
 
     const loginWallet = async (auth: Auth) => {
         console.log('start login wallet');
@@ -32,6 +34,17 @@ export default function LoginPage() {
         console.log('idToken');
         console.log(idToken);
     };
+
+    const verifyCheck = () => {
+        // verifyを取得
+        const authUser = getAuthUser();
+        const isVerify = authUser?.emailVerified;
+        if (isVerify) {
+            router.push('/');
+        } else {
+            setIsFailedVerify(true);
+        }
+    }
 
     useEffect(() => {
         const auth = getAuthentication();
@@ -47,9 +60,11 @@ export default function LoginPage() {
                     // TODO: change password mail text
                     user.sendEmailVerification();
                     // TODO: add verify mail navigation
+                    setIsLogin(true);
                 } else {
                     console.log('success login');
                     console.log(user);
+                    router.push('/');
                 }
             } else {
                 console.log('not registered');
@@ -88,10 +103,18 @@ export default function LoginPage() {
 
     return (
         <Background>
-            <div id='firebaseui-auth-container'>login Page</div>
+            {!isLogin ? (
+                <div id='firebaseui-auth-container'>login Page</div>
+            ) : (
+                <>
+                    <TempDiv>メールを確認してください。メール確認後は以下のボタンを押してください。</TempDiv>
+                    <TempDiv onClick={() => verifyCheck()}>Yes, I Verified !</TempDiv>
+                    {isFailedVerify && (<TempDiv2>まだ本人確認ができていません！</TempDiv2>)}
+                </>
+            )}
             // TODO: change loading image
             <div id='loader'>Now Loading...</div>
-            <div onClick={() => logout()}> log out </div>
+            <TempDiv onClick={() => logout()}> log out </TempDiv>
             <div onClick={() => router.push('/selectCharacter')}> select character </div>
             <div onClick={() => logout()}> log out </div>
         </Background>
@@ -103,4 +126,12 @@ const Background = styled.div`
     height: 100%;
     background-image: url(/static/images/background/background_black.png);
     background-size: cover;
+`;
+
+const TempDiv = styled.div`
+    color: #fff;
+`;
+
+const TempDiv2 = styled.div`
+    color: #f00;
 `;

@@ -13,6 +13,7 @@ import {
 import { logoutWeb3Auth } from '../infrastructure/web3Auth/web3AuthConfig';
 
 export const getAuthentication = () => {
+    console.log('in getAuthentication');
     const app = firebase.initializeApp(firebaseConfig);
     const auth = getAuthFromFirebase(app);
     return auth;
@@ -25,6 +26,7 @@ export const authInitialize = (paramAuth?: Auth) => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log('onAuthStateChanged: userGet');
+            console.log(user);
             // TODO: change secure code
             const userCredential = getCredentialStorage();
             if (userCredential == null || user.uid != userCredential.uid) {
@@ -32,6 +34,7 @@ export const authInitialize = (paramAuth?: Auth) => {
                     uid: user.uid,
                     isLogin: isLoginSuccess(user),
                 });
+                return user;
             }
         }
     });
@@ -63,4 +66,12 @@ export const logout = async () => {
 export const getToken = async (user: User) => {
     const token = await getIdToken(user, true);
     return token;
+};
+
+export const getAuthUser = (paramAuth?: Auth): AuthUser | null => {
+    const auth = paramAuth || getAuthentication();
+    console.log(auth);
+    const user = auth.currentUser;
+    console.log(user);
+    return user;
 };
