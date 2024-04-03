@@ -20,18 +20,18 @@ import { connectWeb3Auth } from '@/app/infrastructure/web3Auth/web3AuthConfig'
 export default function LoginPage() {
     const router = useRouter();
 
-    // const loginWallet = async (auth: Auth) => {
-    //     console.log('start login wallet');
-    //     const user = auth.currentUser;
-    //     console.log(user);
-    //     if (user == null) {
-    //         return;
-    //     }
-    //     const idToken = await getIdToken(user, true);
-    //     connectWeb3Auth(user.uid, idToken);
-    //     console.log('idToken');
-    //     console.log(idToken);
-    // };
+    const loginWallet = async (auth: Auth) => {
+        console.log('start login wallet');
+        const user = auth.currentUser;
+        console.log(user);
+        if (user == null) {
+            return;
+        }
+        const idToken = await getIdToken(user, true);
+        connectWeb3Auth(user.uid, idToken);
+        console.log('idToken');
+        console.log(idToken);
+    };
 
     useEffect(() => {
         const auth = getAuthentication();
@@ -62,8 +62,8 @@ export default function LoginPage() {
                 signInSuccessWithAuthResult: function (authResult, redirectUrl) {
                     // TODO: redirect TOP page
                     console.log('success login method');
-                    //loginWallet(auth);
-                    walletLogin(auth);
+                    loginWallet(auth);
+                    //walletLogin(auth);
                     return true;
                 },
                 uiShown: function () {
