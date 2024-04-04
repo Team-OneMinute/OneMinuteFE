@@ -1,10 +1,18 @@
 // infrastructure
-import { mintNft } from '@/app/api/infrastructure/nft';
+import { gasLessCall } from '@/app/api/infrastructure/gelato/gassLessCall';
 
-export const mintCharacterNft = (email: string, imageUrl: string) => {
+export const mintCharacterNft = async (walletAddress: string, imageUrl: string) => {
     // TODO: into const file
-    const nftName = 'One Minute Character NFT';
-    const description = 'One Minute Character NFT Description'; 
-    const COLLECTION_ID = '1b9cd598-90aa-4cdf-86b8-a0479c5a1ad2';
-    mintNft(email, imageUrl, nftName, description, COLLECTION_ID);
+    if (!checkIdImage(imageUrl)) throw new Error("imageUrl invalid error");
+
+    const targetNftContract = '0x093d8549D8cBcF5844B23f508ac2c1687E92862D';
+    // TODO: add .env file
+    const chinId = 6038361;
+    const res = await gasLessCall(walletAddress, targetNftContract, chinId);
+    return res;
+};
+
+const checkIdImage = (imageUrl: string) => {
+    // TODO: check white check
+    return true;
 };

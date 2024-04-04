@@ -61,7 +61,10 @@ export default function SelectCharacterPage() {
     const selectedCharacter = () => {
         setCharacterFlgInUser(user!.docNo);
         setSubmitCharacter(true);
-        selectCharacter(String(selectedImgID), user!.mailAddress);
+
+        // TODO: Web3Auth get
+        const walletAddress = '0x9E20124F51e236D008886713a8FA6F522472892B';
+        selectCharacter(user!.userId, walletAddress, String(selectedImgID));
     };
 
     const modalOnclickHandler = () => {

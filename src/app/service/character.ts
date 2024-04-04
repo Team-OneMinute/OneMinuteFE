@@ -1,9 +1,10 @@
 // infrastructure
-import { mintNft, getMyNft } from '@/app/infrastructure/crossmint/nft';
+import { getMyNft } from '@/app/infrastructure/crossmint/nft';
+import { mintNft } from '@/app/infrastructure/api/nft';
 
-export const selectCharacter = async (id: string, email: string) => {
+export const selectCharacter = async (uid: string, walletAddress: string, id: string) => {
     const imageUrl = getCharacterImageUrl(id);
-    mintNft(id, email, imageUrl);
+    mintNft(uid, walletAddress, imageUrl);
     // const data = response.json().then((value) => {
     //     console.log(value);
     // });
