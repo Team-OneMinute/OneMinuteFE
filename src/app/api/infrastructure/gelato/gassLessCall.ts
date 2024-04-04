@@ -4,9 +4,7 @@ import NFTDropABI from '@/app/assets/abi/NFTDrop.json';
 
 export const gasLessCall = async (address: string, target: string, targetChainId: number) => {
     const relay = new GelatoRelay();
-    console.log("gasless call method start");
-    // target NFT contract
-    //const target = '0x093d8549D8cBcF5844B23f508ac2c1687E92862D';
+
     // relay request parameters
     const feeToken = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
     //const iface = new ethers.utils.Interface(NFTDropABI);
@@ -18,6 +16,7 @@ export const gasLessCall = async (address: string, target: string, targetChainId
 
     // INPUT SPONSOR API KEY HERE TO MAKE SURE THAT YOU CAN GET GOING!
     // HEAD OVER TO https://relay.gelato.network TO GET STARTED!
+    // .env or firebase key manage
     const sponsorAPIkey = '_kSxp9yI_MYMhZ93Ynpz_RQ_4WJd93RVkm45mNIWD8E_';
 
     const chainId = ethers.toBigInt(targetChainId);
