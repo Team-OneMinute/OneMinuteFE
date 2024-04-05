@@ -32,24 +32,3 @@ export const fetchNft = async (email: string) => {
     // console.log(nfts);
     return nfts;
 };
-
-export const mint = (recipientAddress: string, metaData: any, collectionId: string) => {
-    const ENV = 'staging';
-    const url = `https://${ENV}.crossmint.com/api/2022-06-09/collections/${collectionId}/nfts`;
-    const options = {
-        method: 'POST',
-        headers: {
-            accept: 'application/json',
-            'content-type': 'application/json',
-            'x-api-key': API_KEY,
-        },
-        body: JSON.stringify({
-            recipient: recipientAddress,
-            metadata: metaData,
-        }),
-    };
-    fetch(url, options)
-        .then((res) => res.json())
-        .then((json) => console.log(json))
-        .catch((err) => console.error('error:' + err));
-};

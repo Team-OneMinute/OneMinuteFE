@@ -1,17 +1,6 @@
 // utils
 import { emailUrlEncode } from '@/app/utils/emailUrlEncode';
 
-export const mintNft = async (id: string, email: string, imageUrl: string) => {
-    const response = await fetch('/api/mint/nft', {
-        method: 'POST',
-        body: JSON.stringify({
-            id: id,
-            email: email,
-            imageUrl: imageUrl,
-        }),
-    });
-};
-
 export const getMyNft = (mailAddress: string) => {
     const apiKey =
         'ck_staging_5ixm3ij57utqcHuAKtiWyJEbFgZUnbd91xHKbB7cEVX5CpPz7dF6H6xGvxbjpX7Tn1yAB67fdEev2fEfRhzBRPWtuVAKLtbvBkH9d9rgv7ChKf8QM6dHsQuw1CTUfsByUEi4Zh6cfm76GCxVJHM23pSxHFp7Dv7QoqwVSn8EMAWPi1CZ5kHdcBitUHxUunHzpv5v32oKenHxfzpw7jk8s8jc';

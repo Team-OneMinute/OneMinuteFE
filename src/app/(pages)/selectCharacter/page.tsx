@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Puff } from 'react-loader-spinner';
 
 // service
 import { ButtonBase } from '@/app/component/Atoms/Button';
@@ -19,7 +20,9 @@ export default function SelectCharacterPage() {
     const [selectedImgID, setSelectedGameId] = useState<number>(0);
     const [user, setUser] = useState<User | null>(null);
     const [submitCharacter, setSubmitCharacter] = useState<boolean>(false);
+    const [mintLoading, setMintLoading] = useState<boolean>(false);
     const characterNum = 4;
+    const [tokenId, setTokenId] = useState<string>("");
 
     const tmpPathHead = '/static/images/temp/character/character';
     const tmpPathTail = '.png';
@@ -41,7 +44,12 @@ export default function SelectCharacterPage() {
         fetchUser();
     }, []);
 
-    // TODO: NFTミントしたらモーダル出して、ログイン遷移作る
+    useEffect(() => {
+        if (tokenId != "") {
+            setMintLoading(false);
+        }
+    }, [tokenId]);
+
     const inActiveCharacter = () => {
         const imgList = [];
         for (let i = 0; i < characterNum; i++) {
@@ -58,10 +66,21 @@ export default function SelectCharacterPage() {
         return <ActiveCharacterImage src={fullPath} />;
     };
 
-    const selectedCharacter = () => {
+    const selectedCharacter = async () => {
         setCharacterFlgInUser(user!.docNo);
         setSubmitCharacter(true);
-        selectCharacter(String(selectedImgID), user!.mailAddress);
+
+        // TODO: Web3Auth get
+        const walletAddress = '0x9E20124F51e236D008886713a8FA6F522472892B';
+
+        setMintLoading(true);
+        const result = await selectCharacter(user!.userId, walletAddress, String(selectedImgID));
+        // // TODO: add banner while claiming thr nft
+        // // https://github.com/gelatodigital/gelato-thirdweb-relay/blob/master/src/components/apps/GaslessNFTApp.tsx#L94
+        const tokenId = result.relayResponse.tokenId;
+        setTokenId(tokenId);
+        const baseUrl = result.baseUrl;
+
     };
 
     const modalOnclickHandler = () => {
@@ -85,7 +104,18 @@ export default function SelectCharacterPage() {
             <InfoArea>
                 <InfoText>character info</InfoText>
             </InfoArea>
-            {submitCharacter == true && (
+                <LoadingArea>
+                    <Puff
+                        visible={mintLoading}
+                        height='80'
+                        width='80'
+                        color='#4fa94d'
+                        ariaLabel='puff-loading'
+                        wrapperStyle={{}}
+                        wrapperClass=''
+                    />
+                </LoadingArea>
+            {tokenId != '' && mintLoading == false && (
                 <SelectedCharacterModal
                     title='Congratulation'
                     explanation='Character creating... wait a minute'
@@ -168,4 +198,13 @@ const ButtonArea = styled.div`
     display: flex;
     justify-content: center;
     padding: 3% 20%;
+`;
+
+const LoadingArea = styled.div`
+    position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
 `;
