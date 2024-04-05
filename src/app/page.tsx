@@ -85,7 +85,7 @@ export default function App() {
                 // TODO: log in dev environments only
                 setCredential(tmpCredential);
 
-                console.log("start user data fetch");
+                console.log('start user data fetch');
                 const userData = await getUser(tmpCredential.uid);
                 console.log('user');
                 console.log(userData);
@@ -134,7 +134,7 @@ export default function App() {
 
     const selectCharacterClick = () => {
         router.push('/selectCharacter');
-    }
+    };
 
     const loginUserHeaderArea = () => {
         console.log(user?.purchasedNftFlg);
@@ -142,7 +142,7 @@ export default function App() {
             // TODO: blockchain接続後、src入れかえ
             <>
                 <UserArea onClick={() => router.push('/user')}>
-                    <UserNftImg src='/static/images/temp/tmpUser.png' />
+                    <UserNftImg src='/static/images/temp/character/character1.png' />
                     <UserTotalAmount>{`${totalGetReward()}`}</UserTotalAmount>
                 </UserArea>
                 {user?.characterNftFlg == false && (
@@ -159,7 +159,7 @@ export default function App() {
             // TODO:無課金ユーザ用画像用意
             <>
                 <UserArea onClick={() => router.push('/user')}>
-                    <UserNftImg src='/static/images/temp/tmpUser.png' />
+                    <UserNftImg src='/static/images/temp/character/Defaultcharacter.png' />
                 </UserArea>
                 <LoginArea onClick={() => router.push('/login')}>ログイン</LoginArea>
             </>
@@ -255,7 +255,6 @@ const UserArea = styled.div`
 `;
 
 const UserNftImg = styled.img`
-    width: ${USER_NFT_IMAGE_SIZE}px;
     height: ${USER_NFT_IMAGE_SIZE}px;
 `;
 
@@ -266,9 +265,7 @@ const UserTotalAmount = styled.div`
     color: #ffffff;
 `;
 
-const SelectCharacterButtonArea = styled.div`
-
-`;
+const SelectCharacterButtonArea = styled.div``;
 
 const LoginArea = styled.div`
     color: #fff;
