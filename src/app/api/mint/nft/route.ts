@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // service
 import { mintCharacterNft } from '@/app/api/services/nft';
+import { RelayResponse } from '@gelatonetwork/relay-sdk/dist/lib/types';
 
 interface PostParameters {
     uid: string;
@@ -12,6 +13,8 @@ interface PostParameters {
 interface ResponseParameters {
     code: string;
     message: string;
+    relayResponse: RelayResponse;
+    baseUrl: string;
     // TODO: サードパーティのエラーコード追加
 }
 
@@ -20,14 +23,22 @@ export const POST = async (req: NextRequest) => {
     // TODO: exist user check
     if (!existUser(uid)) return;
     try {
-        const res = mintCharacterNft(walletAddress, imageUrl);
-        return NextResponse.json(res);
+        const res = await mintCharacterNft(walletAddress, imageUrl);
+        console.log("es start");
+        console.log(res);
+        const response = {
+            code: '000',
+            message: 'success create gelato transaction',
+            relayResponse: res,
+            baseUrl: 'https://relay.gelato.digital/tasks/status/',
+        } as ResponseParameters;
+        return NextResponse.json(response);
     } catch (err) {
-        const responseCode = {
+        const res = {
             code: '999',
             message: 'Mint nft is fail.',
         } as ResponseParameters;
-        return NextResponse.json(responseCode);
+        return NextResponse.json(res);
     }
 };
 

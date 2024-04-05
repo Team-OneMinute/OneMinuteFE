@@ -41,7 +41,6 @@ export default function SelectCharacterPage() {
         fetchUser();
     }, []);
 
-    // TODO: NFTミントしたらモーダル出して、ログイン遷移作る
     const inActiveCharacter = () => {
         const imgList = [];
         for (let i = 0; i < characterNum; i++) {
@@ -58,13 +57,17 @@ export default function SelectCharacterPage() {
         return <ActiveCharacterImage src={fullPath} />;
     };
 
-    const selectedCharacter = () => {
+    const selectedCharacter = async () => {
         setCharacterFlgInUser(user!.docNo);
         setSubmitCharacter(true);
 
         // TODO: Web3Auth get
         const walletAddress = '0x9E20124F51e236D008886713a8FA6F522472892B';
-        selectCharacter(user!.userId, walletAddress, String(selectedImgID));
+        const result = await selectCharacter(user!.userId, walletAddress, String(selectedImgID));
+        // TODO: add banner while claiming thr nft
+        // https://github.com/gelatodigital/gelato-thirdweb-relay/blob/master/src/components/apps/GaslessNFTApp.tsx#L94
+        const tokenId = result.relayResponse.tokenId;
+        const baseUrl = result.baseUrl;
     };
 
     const modalOnclickHandler = () => {

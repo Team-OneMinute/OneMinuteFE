@@ -4,10 +4,8 @@ import { mintNft } from '@/app/infrastructure/api/nft';
 
 export const selectCharacter = async (uid: string, walletAddress: string, id: string) => {
     const imageUrl = getCharacterImageUrl(id);
-    mintNft(uid, walletAddress, imageUrl);
-    // const data = response.json().then((value) => {
-    //     console.log(value);
-    // });
+    const result = await mintNft(uid, walletAddress, imageUrl);
+    return result;
 };
 
 const getCharacterImageUrl = (id: string) => {

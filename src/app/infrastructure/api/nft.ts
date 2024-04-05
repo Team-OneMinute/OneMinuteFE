@@ -7,5 +7,7 @@ export const mintNft = async (uid: string, walletAddress: string, imageUrl: stri
             imageURl: imageUrl,
         }),
     });
-    console.log(response);
+    return await response.json().then((value) => {
+        return value;
+    });
 };
