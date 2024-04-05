@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 
@@ -10,14 +10,20 @@ import { getMyCharacter } from '@/app/service/character';
 
 // components
 import { ButtonBase } from '@/app/component/Atoms/Button';
+import { StoreContext } from '@/app/store/StoreProvider';
 
 export default function UserPage() {
     const router = useRouter();
     const [user, setUser] = useState<User>();
     const [isLogin, setIsLogin] = useState<boolean>(false);
+    const { web3Auth } = useContext(StoreContext);
+    console.log("user page start");
+    console.log(web3Auth);
+    console.log(web3Auth.sessionId);
 
-    
     useEffect(() => {
+        console.log("user page useEffect start");
+        // initWeb3Auth(web3AuthState);
         const credential = getCredential();
         setIsLogin(isLoginCheck(credential));
 
@@ -32,6 +38,7 @@ export default function UserPage() {
             const userData = await getUser(userId);
             await setUser(userData);
         })();
+        console.log('user page useEffect end');
     }, []);
 
     const getNftData = () => {
@@ -41,7 +48,7 @@ export default function UserPage() {
     };
 
     const logoutClick = () => {
-        logout();
+        logout(web3Auth);
         router.push('/');
     };
 

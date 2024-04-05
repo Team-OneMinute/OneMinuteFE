@@ -1,4 +1,4 @@
-import { PrivateKeyProvider, Web3Auth } from '@web3auth/single-factor-auth';
+import { PrivateKeyProvider, Web3Auth, Web3AuthOptions } from '@web3auth/single-factor-auth';
 import { CHAIN_NAMESPACES, IProvider } from '@web3auth/base';
 import { EthereumPrivateKeyProvider } from '@web3auth/ethereum-provider';
 import { signInWithEmailLink, isSignInWithEmailLink, sendSignInLinkToEmail } from 'firebase/auth';
@@ -33,51 +33,81 @@ const chainConfig = {
 };
 
 // Initialising Web3Auth Single Factor Auth SDK
-const web3authSfa = new Web3Auth({
-    clientId, // Get your Client ID from Web3Auth Dashboard
-    web3AuthNetwork: 'sapphire_devnet', // Get your Network from Web3Auth Dashboard
-    usePnPKey: false, // Setting this to true returns the same key as PnP Web SDK, By default, this SDK returns CoreKitKey.
-});
+// const web3authSfa = new Web3Auth({
+//     clientId, // Get your Client ID from Web3Auth Dashboard
+//     web3AuthNetwork: 'sapphire_devnet', // Get your Network from Web3Auth Dashboard
+//     usePnPKey: false, // Setting this to true returns the same key as PnP Web SDK, By default, this SDK returns CoreKitKey.
+// });
 
 // Initializing Ethereum Provider
 export const privateKeyProvider = new EthereumPrivateKeyProvider({
     config: { chainConfig },
 });
 
-web3authSfa.init(privateKeyProvider as PrivateKeyProvider);
+// web3authSfa.init(privateKeyProvider as PrivateKeyProvider).then(initRet => {
+//     console.log("web3AuthSfa init");
+//     console.log(initRet);
+// });
 
-export const connectWeb3Auth = async (uid: string, idToken: string) => {
+export const web3AuthOptions: Web3AuthOptions = {
+    clientId: 'BDvwsfMRP29PwNqUbOStvQiLlCeJrGYfxxzbbJ7CwW1IeVp37nISy9NGIrWwM_yuUgXm5yWvvHednxBEPxoGguQ', // Get your Client ID from Web3Auth Dashboard
+    web3AuthNetwork: 'sapphire_devnet', // Get your Network from Web3Auth Dashboard
+    usePnPKey: false, // Setting this to true returns the same key as PnP Web SDK, By default, this SDK returns CoreKitKey.
+};
+
+export const initWeb3Auth = async (web3Auth: Web3Auth) => {
+    console.log('initWeb3Auth start');
+    await web3Auth.init(privateKeyProvider as PrivateKeyProvider);
+    // web3AuthState.setWeb3Auth(web3AuthSfa);
+    console.log('initWeb3Auth end');
+    return true;
+};
+
+export const connectWeb3Auth = async (web3Auth: Web3Auth, uid: string, idToken: string) => {
     console.log('start connect web3 auth');
-    console.log(web3authSfa);
-    console.log(uid);
-    console.log(idToken);
-    const res = await web3authSfa
+    // console.log(web3authSfa);
+    // console.log(uid);
+    // console.log(idToken);
+    const res = await web3Auth
         .connect({
             verifier: 'OneMinute-firebase-dev',
             verifierId: uid,
             idToken: idToken,
         })
-        .then(() => {
-            getUserInfoOnChain(web3authSfa);
-            getSymbol(web3authSfa);
+        .then(async() => {
+            console.log('in connectWeb3Auth: start then');
+            const walletAddress = await getUserInfoOnChain(web3Auth).then((address) => {
+                console.log('in connectWeb3Auth: wallet address');
+                console.log(address);
+                return address;
+            });
+            getSymbol(web3Auth);
+            // return web3AuthSfa;
+            return walletAddress;
         });
-    console.log('Auth res');
-    console.log(res);
+    // console.log('Auth res');
+    // console.log(res);
+    return res;
 };
 
-export const logoutWeb3Auth = async () => {
-    if (web3authSfa == null) return;
-    await web3authSfa.logout();
+export const logoutWeb3Auth = async (web3Auth: Web3Auth) => {
+    // if (web3AuthSfa == null) return;
+    console.log("logoutWeb3Auth start");
+    await web3Auth.logout();
+    console.log('logoutWeb3Auth end');
 };
 
-export const getUserInfoOnChain = async (web3authSfa: Web3Auth) => {
+export const getUserInfoOnChain = async (web3authSfa: Web3Auth): Promise<string> => {
     console.log('wallet check');
+    console.log(web3authSfa);
+    console.log(web3authSfa.provider);
     const ethersProvider = new ethers.BrowserProvider(web3authSfa.provider as Eip1193Provider);
     const signer = await ethersProvider.getSigner();
 
     // Get the user's Ethereum public address
-    const address = signer.getAddress();
-    console.log(address);
+    const userWalletAddress = await signer.getAddress();
+    console.log(userWalletAddress);
+    return userWalletAddress;
 };
 
 const getSymbol = async (web3authSfa: Web3Auth) => {

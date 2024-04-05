@@ -11,6 +11,7 @@ import {
     removeCredentialStorage,
 } from '@/app/service/credential';
 import { logoutWeb3Auth } from '../infrastructure/web3Auth/web3AuthConfig';
+import Web3Auth from '@web3auth/single-factor-auth';
 
 export const getAuthentication = () => {
     console.log('in getAuthentication');
@@ -29,7 +30,11 @@ export const authInitialize = (paramAuth?: Auth) => {
             console.log(user);
             // TODO: change secure code
             const userCredential = getCredentialStorage();
-            if (userCredential == null || user.uid != userCredential.uid) {
+            if (
+                userCredential == null ||
+                user.uid != userCredential.uid ||
+                user.emailVerified != userCredential.isLogin
+            ) {
                 setCredentialStorage({
                     uid: user.uid,
                     isLogin: isLoginSuccess(user),
@@ -38,6 +43,7 @@ export const authInitialize = (paramAuth?: Auth) => {
             }
         }
     });
+    return auth;
 };
 
 export const isLoginSuccess = (user: AuthUser): boolean => {
@@ -55,11 +61,11 @@ export const getCredential = () => {
     return getCredentialStorage();
 };
 
-export const logout = async () => {
+export const logout = async (web3Auth: Web3Auth) => {
     // TODO: remove session storage
     const auth = getAuthentication();
     await signOut(auth);
-    await logoutWeb3Auth();
+    await logoutWeb3Auth(web3Auth);
     removeCredentialStorage();
 };
 

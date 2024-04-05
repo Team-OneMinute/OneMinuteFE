@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht, USER_AREA_MARGIN, USER_NFT_IMAGE_SIZE } from './styles';
@@ -27,6 +27,9 @@ import { getGameScoreForObj } from './service/score';
 import GameDetailModal from './component/GameDetailModal';
 import NftPurchaseModal from './component/NftPurchaseModal';
 import { ButtonBase } from '@/app/component/Atoms/Button';
+import { StoreContext } from './store/StoreProvider';
+import { connectWeb3Auth, getUserInfoOnChain } from './infrastructure/web3Auth/web3AuthConfig';
+import { Auth, getIdToken } from 'firebase/auth';
 
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
@@ -43,6 +46,9 @@ export default function App() {
     const [credential, setCredential] = useState<UserCredential | null>(null);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
+    // const [auth, setAuth] = useState<Auth | undefined>(undefined);
+    const { firebaseAuthState, web3Auth } = useContext(StoreContext);
+    const firebaseAuth = firebaseAuthState.firebaseAuth;
 
     const pagination = {
         clickable: true,
@@ -60,7 +66,18 @@ export default function App() {
     }, []);
 
     const topPageInitialized = async (): Promise<void> => {
-        authInitialize();
+        console.log("in topPageInitialized");
+        const walletAddress = await getUserInfoOnChain(web3Auth).then((address) => {
+            console.log('in connectWeb3Auth: wallet address');
+            console.log(address);
+            return address;
+        });
+        console.log(walletAddress);
+
+        console.log("topPageInitialized start");
+        const auth = authInitialize(firebaseAuth);
+        console.log(auth);
+        // setAuth(auth);
 
         const gameList = await getAllActiveGames();
         const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount);

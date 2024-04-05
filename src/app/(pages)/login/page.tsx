@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 // firebase
@@ -15,12 +15,14 @@ import { walletLogin } from '@/app/service/wallet';
 
 // tmp
 import { connectWeb3Auth } from '@/app/infrastructure/web3Auth/web3AuthConfig';
+import { StoreContext } from '@/app/store/StoreProvider';
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
     const router = useRouter();
     const [isLogin, setIsLogin] = useState<boolean>(false);
     const [isFailedVerify, setIsFailedVerify] = useState<boolean>(false);
+    const { firebaseAuthState, web3Auth } = useContext(StoreContext);
 
     const loginWallet = async (auth: Auth) => {
         console.log('start login wallet');
@@ -30,7 +32,11 @@ export default function LoginPage() {
             return;
         }
         const idToken = await getIdToken(user, true);
-        connectWeb3Auth(user.uid, idToken);
+        // await initWeb3Auth(web3Auth).then(async (doneInitWeb3Auth) => {
+        //     await connectWeb3Auth(web3Auth, user.uid, idToken);
+        //     // console.log(web3Auth);
+        // });
+        await connectWeb3Auth(web3Auth, user.uid, idToken);
         console.log('idToken');
         console.log(idToken);
     };
@@ -49,6 +55,7 @@ export default function LoginPage() {
 
     useEffect(() => {
         const auth = getAuthentication();
+        // const auth = firebaseAuthState.firebaseAuth;
         firebase.auth().onAuthStateChanged((user) => {
             console.log('authentication');
             console.log(user);
@@ -79,6 +86,7 @@ export default function LoginPage() {
                     // TODO: redirect TOP page
                     console.log('success login method');
                     loginWallet(auth);
+                    firebaseAuthState.setFirebaseAuth(auth);
                     //walletLogin(auth);
                     return true;
                 },
@@ -110,14 +118,14 @@ export default function LoginPage() {
                 <>
                     <TempDiv>メールを確認してください。メール確認後は以下のボタンを押してください。</TempDiv>
                     <TempDiv onClick={() => verifyCheck()}>Yes, I Verified !</TempDiv>
-                    {isFailedVerify && (<TempDiv2>まだ本人確認ができていません！</TempDiv2>)}
+                    {isFailedVerify && <TempDiv2>まだ本人確認ができていません！</TempDiv2>}
                 </>
             )}
             // TODO: change loading image
             <div id='loader'>Now Loading...</div>
-            <TempDiv onClick={() => logout()}> log out </TempDiv>
+            <TempDiv onClick={() => logout(web3Auth)}> log out </TempDiv>
             <div onClick={() => router.push('/selectCharacter')}> select character </div>
-            <div onClick={() => logout()}> log out </div>
+            <div onClick={() => logout(web3Auth)}> log out </div>
         </Background>
     );
 }
