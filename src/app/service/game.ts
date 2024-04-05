@@ -32,10 +32,10 @@ export const getAllActiveGames = async () => {
     return gameList;
 };
 
-export const playGame = async (uid: string, gameId: string) => {
-    const response = await play(uid, gameId);
+export const playGame = async (uid: string, gameId: string, walletAddress: string) => {
+    const response = await play(uid, gameId, walletAddress);
     return response;
-}
+};
 
 const initialize = () => {
     return fireStoreInitialized();

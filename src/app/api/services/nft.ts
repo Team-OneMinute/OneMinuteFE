@@ -12,6 +12,11 @@ export const mintCharacterNft = async (walletAddress: string, imageUrl: string) 
     return res;
 };
 
+export const getNfts = async (walletAddress: string) => {
+    // walletaddress to smartwalle address
+    // get nft info
+};
+
 const checkIdImage = (imageUrl: string) => {
     // TODO: check white list check
     return true;

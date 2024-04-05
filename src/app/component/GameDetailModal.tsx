@@ -40,7 +40,10 @@ const GameDetailModal: React.FC<props> = ({
 
     const onClickMainPlayHandler = async () => {
         // this route is main play
-        const response = await playGame(user.userId, game.gameId);
+        // FIXME: change secure code. Now API requires wallet address, 
+        // but when use other address, could not search bought own nft.
+        const walletAddress = "0xABC1234";
+        const response = await playGame(user.userId, game.gameId, walletAddress);
         console.log(response);
         if (response == '0000') {
             await playInitialize();

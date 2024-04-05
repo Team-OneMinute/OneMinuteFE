@@ -8,12 +8,13 @@ import { ResponseCodeGamePlay } from '@/app/api/entity/responseCode';
 interface PostParameters {
     uid: string;
     gameId: string;
+    walletAddress: string;
 }
 
 export const POST = async (req: NextRequest) => {
-    const { uid, gameId } = (await req.json()) as PostParameters;
+    const { uid, gameId, walletAddress } = (await req.json()) as PostParameters;
 
-    const checkPlayStatus = await checkPlay(uid);
+    const checkPlayStatus = await checkPlay(uid, walletAddress);
 
     switch (checkPlayStatus) {
         case CheckGamePlayStatus.OK:
