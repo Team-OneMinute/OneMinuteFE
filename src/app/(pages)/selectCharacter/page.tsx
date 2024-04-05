@@ -104,10 +104,9 @@ export default function SelectCharacterPage() {
             <InfoArea>
                 <InfoText>character info</InfoText>
             </InfoArea>
-            {mintLoading == true && (
                 <LoadingArea>
                     <Puff
-                        visible={true}
+                        visible={mintLoading}
                         height='80'
                         width='80'
                         color='#4fa94d'
@@ -116,7 +115,6 @@ export default function SelectCharacterPage() {
                         wrapperClass=''
                     />
                 </LoadingArea>
-            )}
             {tokenId != '' && mintLoading == false && (
                 <SelectedCharacterModal
                     title='Congratulation'
