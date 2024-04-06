@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht, USER_AREA_MARGIN, USER_NFT_IMAGE_SIZE } from './styles';
@@ -16,7 +16,7 @@ import './styles.css';
 import { getAllActiveGames } from './service/game';
 import { getPoolsForObj } from './service/pool';
 import { getUser } from './service/user';
-import { authInitialize, getCredential } from './service/authentication';
+import { authInitialize, getCredential, getToken } from './service/authentication';
 
 // slides
 import AllGamesSlide from './slides/AllGameSlide';
@@ -28,14 +28,19 @@ import GameDetailModal from './component/GameDetailModal';
 import NftPurchaseModal from './component/NftPurchaseModal';
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { StoreContext } from './store/StoreProvider';
-import { connectWeb3Auth, getUserInfoOnChain } from './infrastructure/web3Auth/web3AuthConfig';
+import { connect, getUserInfoOnChain } from './infrastructure/web3Auth/web3AuthConfig';
 import { Auth, getIdToken } from 'firebase/auth';
+import { connectWeb3Auth, fetchFirebaseAuth } from './store/StoreService';
+import { getCredentialStorage } from './service/credential';
+import { initAuth } from './service/initialize';
 
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
 export default function App() {
     // TODO: 右スワイプでゲーム画面に戻れる問題あり
     const router = useRouter();
+    const didLogRef = useRef<boolean>(false);
+
     const [games, setGames] = useState<Game[]>([]);
     const [rankings, setRankings] = useState<Score[]>([]);
     const [pools, setPools] = useState<Pool[]>([]);
@@ -47,8 +52,15 @@ export default function App() {
     const [initialized, setInitialized] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     // const [auth, setAuth] = useState<Auth | undefined>(undefined);
-    const { firebaseAuthState, web3Auth } = useContext(StoreContext);
-    const firebaseAuth = firebaseAuthState.firebaseAuth;
+
+    const { firebaseAuthStore, web3AuthStore } = useContext(StoreContext);
+    const firebaseAuth = firebaseAuthStore.state.firebaseAuth;
+    const isFirebaseFetching = firebaseAuthStore.state.isFetching;
+    const firebaseAuthDispatch = firebaseAuthStore.dispatch;
+    const web3Auth = web3AuthStore.state.web3Auth;
+    const isWeb3AuthConnecting = web3AuthStore.state.isConnecting;
+    const web3AuthDispatch = web3AuthStore.dispatch;
+    const isFetching = isFirebaseFetching || isWeb3AuthConnecting;
 
     const pagination = {
         clickable: true,
@@ -66,18 +78,11 @@ export default function App() {
     }, []);
 
     const topPageInitialized = async (): Promise<void> => {
-        console.log("in topPageInitialized");
-        const walletAddress = await getUserInfoOnChain(web3Auth).then((address) => {
-            console.log('in connectWeb3Auth: wallet address');
-            console.log(address);
-            return address;
-        });
-        console.log(walletAddress);
+        console.log('topPageInitialized start');
 
-        console.log("topPageInitialized start");
-        const auth = authInitialize(firebaseAuth);
-        console.log(auth);
-        // setAuth(auth);
+        if (!isFetching) {
+            await initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
+        }
 
         const gameList = await getAllActiveGames();
         const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount);
@@ -94,16 +99,23 @@ export default function App() {
         console.log('initialized started');
         if (initialized == true) {
             // credential init
-            console.log('credential check start');
-            const tmpCredential = getCredential();
-            console.log('credential');
-            console.log(tmpCredential);
-            if (tmpCredential != null) {
-                // TODO: log in dev environments only
-                setCredential(tmpCredential);
+            // console.log('credential check start');
+            // const tmpCredential = getCredential();
+            // console.log('credential');
+            // console.log(tmpCredential);
+            // if (tmpCredential != null) {
+            //     // TODO: log in dev environments only
+            //     setCredential(tmpCredential);
 
-                console.log("start user data fetch");
-                const userData = await getUser(tmpCredential.uid);
+            //     console.log('start user data fetch');
+            //     const userData = await getUser(tmpCredential.uid);
+            //     console.log('user');
+            //     console.log(userData);
+            //     await setUser(userData);
+            // }
+            const firebaseUser = firebaseAuth?.currentUser;
+            if (firebaseUser != null) {
+                const userData = await getUser(firebaseUser.uid);
                 console.log('user');
                 console.log(userData);
                 await setUser(userData);
@@ -116,8 +128,12 @@ export default function App() {
 
     // initialize
     useEffect(() => {
-        console.log('use effect');
-        topPageInitialized();
+        if (didLogRef.current === false) {
+            didLogRef.current = true;
+        } else {
+            console.log('use effect');
+            topPageInitialized();
+        }
     }, []);
 
     // after initialized
@@ -151,7 +167,7 @@ export default function App() {
 
     const selectCharacterClick = () => {
         router.push('/selectCharacter');
-    }
+    };
 
     const loginUserHeaderArea = () => {
         console.log(user?.purchasedNftFlg);
@@ -193,7 +209,7 @@ export default function App() {
                 wrapperStyle={{}}
                 wrapperClass='dna-wrapper'
             />
-            {loading == false && (
+            {!loading && !isFetching && (
                 <>
                     <SwiperContainer>
                         <HeaderArea>

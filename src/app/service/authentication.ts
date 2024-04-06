@@ -20,8 +20,8 @@ export const getAuthentication = () => {
     return auth;
 };
 
-export const authInitialize = (paramAuth?: Auth) => {
-    const auth = paramAuth || getAuthentication();
+export const authInitialize = (paramAuth: Auth) => {
+    const auth = paramAuth;
 
     // get user credential from firebase authentication
     onAuthStateChanged(auth, (user) => {
@@ -39,11 +39,10 @@ export const authInitialize = (paramAuth?: Auth) => {
                     uid: user.uid,
                     isLogin: isLoginSuccess(user),
                 });
-                return user;
+                // return user;
             }
         }
     });
-    return auth;
 };
 
 export const isLoginSuccess = (user: AuthUser): boolean => {

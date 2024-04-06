@@ -55,7 +55,7 @@ export const web3AuthOptions: Web3AuthOptions = {
     usePnPKey: false, // Setting this to true returns the same key as PnP Web SDK, By default, this SDK returns CoreKitKey.
 };
 
-export const initWeb3Auth = async (web3Auth: Web3Auth) => {
+export const init = async (web3Auth: Web3Auth) => {
     console.log('initWeb3Auth start');
     await web3Auth.init(privateKeyProvider as PrivateKeyProvider);
     // web3AuthState.setWeb3Auth(web3AuthSfa);
@@ -63,30 +63,14 @@ export const initWeb3Auth = async (web3Auth: Web3Auth) => {
     return true;
 };
 
-export const connectWeb3Auth = async (web3Auth: Web3Auth, uid: string, idToken: string) => {
+export const connect = async (web3Auth: Web3Auth, uid: string, idToken: string) => {
     console.log('start connect web3 auth');
-    // console.log(web3authSfa);
-    // console.log(uid);
-    // console.log(idToken);
     const res = await web3Auth
         .connect({
             verifier: 'OneMinute-firebase-dev',
             verifierId: uid,
             idToken: idToken,
         })
-        .then(async() => {
-            console.log('in connectWeb3Auth: start then');
-            const walletAddress = await getUserInfoOnChain(web3Auth).then((address) => {
-                console.log('in connectWeb3Auth: wallet address');
-                console.log(address);
-                return address;
-            });
-            getSymbol(web3Auth);
-            // return web3AuthSfa;
-            return walletAddress;
-        });
-    // console.log('Auth res');
-    // console.log(res);
     return res;
 };
 

@@ -1,5 +1,5 @@
 'use client';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 // firebase
@@ -14,15 +14,27 @@ import { useRouter } from 'next/navigation';
 import { walletLogin } from '@/app/service/wallet';
 
 // tmp
-import { connectWeb3Auth } from '@/app/infrastructure/web3Auth/web3AuthConfig';
+import { connect } from '@/app/infrastructure/web3Auth/web3AuthConfig';
 import { StoreContext } from '@/app/store/StoreProvider';
+import { initAuth } from '@/app/service/initialize';
+import { setFirebaseAuth } from '@/app/store/StoreService';
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
     const router = useRouter();
+    const didLogRef = useRef<boolean>(false);
+
     const [isLogin, setIsLogin] = useState<boolean>(false);
     const [isFailedVerify, setIsFailedVerify] = useState<boolean>(false);
-    const { firebaseAuthState, web3Auth } = useContext(StoreContext);
+
+    const { firebaseAuthStore, web3AuthStore } = useContext(StoreContext);
+    const firebaseAuth = firebaseAuthStore.state.firebaseAuth;
+    const isFirebaseFetching = firebaseAuthStore.state.isFetching;
+    const firebaseAuthDispatch = firebaseAuthStore.dispatch;
+    const web3Auth = web3AuthStore.state.web3Auth;
+    const isWeb3AuthConnecting = web3AuthStore.state.isConnecting;
+    const web3AuthDispatch = web3AuthStore.dispatch;
+    const isFetching = isFirebaseFetching || isWeb3AuthConnecting;
 
     const loginWallet = async (auth: Auth) => {
         console.log('start login wallet');
@@ -36,7 +48,7 @@ export default function LoginPage() {
         //     await connectWeb3Auth(web3Auth, user.uid, idToken);
         //     // console.log(web3Auth);
         // });
-        await connectWeb3Auth(web3Auth, user.uid, idToken);
+        await connect(web3Auth!, user.uid, idToken);
         console.log('idToken');
         console.log(idToken);
     };
@@ -44,8 +56,8 @@ export default function LoginPage() {
     const verifyCheck = () => {
         router.push('/'); // FIXME: 最新のverifyの値取得できず、top画面に戻れないバグ発生中。画面更新なりをして最新のverifyの値を取得できるようにする。暫定対処として強制top画面遷移
         // verifyを取得
-        const authUser = getAuthUser();
-        const isVerify = authUser?.emailVerified;
+        // const authUser = getAuthUser();
+        const isVerify = firebaseAuth?.currentUser?.emailVerified;
         if (isVerify) {
             router.push('/');
         } else {
@@ -54,60 +66,65 @@ export default function LoginPage() {
     }
 
     useEffect(() => {
-        const auth = getAuthentication();
-        // const auth = firebaseAuthState.firebaseAuth;
-        firebase.auth().onAuthStateChanged((user) => {
-            console.log('authentication');
-            console.log(user);
-            if (user != null) {
-                // TODO: add session storage or local storage
-                if (user.emailVerified == false) {
-                    console.log('send verify mail');
-                    console.log(user);
-                    // MEMO: https://qiita.com/mml/items/5e325bb19ba532ca56b7
-                    // TODO: change password mail text
-                    user.sendEmailVerification();
-                    // TODO: add verify mail navigation
-                    setIsLogin(true);
+        if (didLogRef.current === false) {
+            didLogRef.current = true;
+        } else {
+            const auth = getAuthentication();
+            // const auth = firebaseAuthState.firebaseAuth;
+            firebase.auth().onAuthStateChanged((user) => {
+                console.log('authentication');
+                console.log(user);
+                if (user != null) {
+                    // TODO: add session storage or local storage
+                    if (user.emailVerified == false) {
+                        console.log('send verify mail');
+                        console.log(user);
+                        // MEMO: https://qiita.com/mml/items/5e325bb19ba532ca56b7
+                        // TODO: change password mail text
+                        user.sendEmailVerification();
+                        // TODO: add verify mail navigation
+                        setIsLogin(true);
+                    } else {
+                        console.log('success login');
+                        console.log(user);
+                        router.push('/');
+                    }
                 } else {
-                    console.log('success login');
-                    console.log(user);
-                    router.push('/');
+                    console.log('not registered');
                 }
-            } else {
-                console.log('not registered');
-            }
-        });
+            });
 
-        const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
-        ui.start('#firebaseui-auth-container', {
-            callbacks: {
-                signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                    // TODO: redirect TOP page
-                    console.log('success login method');
-                    loginWallet(auth);
-                    firebaseAuthState.setFirebaseAuth(auth);
-                    //walletLogin(auth);
-                    return true;
+            const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+            ui.start('#firebaseui-auth-container', {
+                callbacks: {
+                    signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+                        // TODO: redirect TOP page
+                        console.log('success login method');
+                        setFirebaseAuth(firebaseAuthDispatch, auth);
+                        initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
+                        // loginWallet(auth);
+                        //walletLogin(auth);
+                        return true;
+                    },
+                    uiShown: function () {
+                        // This is what should happen when the form is full loaded. In this example, I hide the loader element.
+                        document.getElementById('loader')!.style.display = 'none';
+                    },
                 },
-                uiShown: function () {
-                    // This is what should happen when the form is full loaded. In this example, I hide the loader element.
-                    document.getElementById('loader')!.style.display = 'none';
+                //signInSuccessUrl: '/', // This is where should redirect if the sign in is successful.
+                signInOptions: [
+                    // TODO: add twitter
+                    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+                ],
+                tosUrl: 'https://www.example.com/terms-conditions', // URL to you terms and conditions.
+                privacyPolicyUrl: function () {
+                    // TODO: add regal policy
+                    window.location.assign('https://www.example.com/privacy-policy');
                 },
-            },
-            //signInSuccessUrl: '/', // This is where should redirect if the sign in is successful.
-            signInOptions: [
-                // TODO: add twitter
-                firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-            ],
-            tosUrl: 'https://www.example.com/terms-conditions', // URL to you terms and conditions.
-            privacyPolicyUrl: function () {
-                // TODO: add regal policy
-                window.location.assign('https://www.example.com/privacy-policy');
-            },
-        });
+            });
+        }
     }, []);
 
     return (
@@ -123,9 +140,8 @@ export default function LoginPage() {
             )}
             // TODO: change loading image
             <div id='loader'>Now Loading...</div>
-            <TempDiv onClick={() => logout(web3Auth)}> log out </TempDiv>
+            {/* <TempDiv onClick={() => logout(web3Auth)}> log out </TempDiv> */}
             <div onClick={() => router.push('/selectCharacter')}> select character </div>
-            <div onClick={() => logout(web3Auth)}> log out </div>
         </Background>
     );
 }
