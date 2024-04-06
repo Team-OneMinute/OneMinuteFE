@@ -3,6 +3,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { NAVIGATION_AREA_HEIGHT, USER_AREA_HEIGht } from '@/app/styles';
 
+// components
+import { ButtonBase } from '@/app/component/Atoms/Button';
+
 interface position {
     x: number;
     y: number;
@@ -54,17 +57,21 @@ const AllGameSlide: React.FC<props> = ({
                         onClick={() => onClickNftAction(game.gameId)}
                     >
                         <GameThumbnailImage src='/static/images/temp/game_thumnail_1.png' />
-                        <SymbolNftImage src='/static/images/temp/User1.png' />
+                        <SymbolNftImage src='/static/images/temp/character/character0.png' />
                     </GameTarget>
                 );
             });
         }
     };
 
+    const showGameInfoHandler = () => {
+        setIsOpenDetailModal(true);
+    };
+
     const rankingOrder = () => {
         const poolSize = pools.length;
         const rankingSize = rankings.length;
-        return `${poolSize} ${rankingSize}`;
+        return <div>{`challenger: ${poolSize} people RankingPools: ${rankingSize}`}</div>;
     };
 
     const maxReward = () => {
@@ -98,9 +105,19 @@ const AllGameSlide: React.FC<props> = ({
         const thirdRangeTopAmount = pools[thirdRangeTopRank - 1].potAmount;
         const thirdRangeUnderAmount = pools[thirdRangeUnderRank - 1].potAmount;
 
-        return `${firstRangeTopRank} ~ ${firstRangeUnderRank} : ${firstRangeTopAmount} ~ ${firstRangeUnderAmount}
-                ${secondRangeTopRank} ~ ${secondRangeUnderRank} : ${secondRangeTopAmount} ~ ${secondRangeUnderAmount}
-                ${thirdRangeTopRank} ~ ${thirdRangeUnderRank} : ${thirdRangeTopAmount} ~ ${thirdRangeUnderAmount}`;
+        return (
+            <>
+                <div>
+                    {firstRangeTopRank} ~ {firstRangeUnderRank} : ${firstRangeTopAmount} ~ ${firstRangeUnderAmount}
+                </div>
+                <div>
+                    {secondRangeTopRank} ~ {secondRangeUnderRank} : ${secondRangeTopAmount} ~ ${secondRangeUnderAmount}
+                </div>
+                <div>
+                    {thirdRangeTopRank} ~ {thirdRangeUnderRank} : ${thirdRangeTopAmount} ~ ${thirdRangeUnderAmount}
+                </div>
+            </>
+        );
     };
 
     return (
@@ -109,11 +126,14 @@ const AllGameSlide: React.FC<props> = ({
                 <GameFieldImage />
                 {getGameTargetDiv(games)}
             </GameFieldArea>
+            z
             <DetailArea>
-                <RankingNumberInfo>Ranking uu {rankingOrder()}</RankingNumberInfo>
+                <RankingNumberInfo>{rankingOrder()}</RankingNumberInfo>
                 <RewardInfo>Max Reward {maxReward()}</RewardInfo>
-                <RankingSummaryInfo>Ranking num {rankingSummary()}</RankingSummaryInfo>
-                <DetailButton onClick={() => setIsOpenDetailModal(true)}>Detail</DetailButton>
+                <RankingSummaryInfo>Ranking pot {rankingSummary()}</RankingSummaryInfo>
+                <DetailButtonArea>
+                    <ButtonBase text='Show Game' onClick={showGameInfoHandler} />
+                </DetailButtonArea>
             </DetailArea>
         </Background>
     );
@@ -158,32 +178,32 @@ const SymbolNftImage = styled.img`
 
 const DetailArea = styled.div`
     position: relative;
-    top: ${USER_AREA_HEIGht + NAVIGATION_AREA_HEIGHT}px;
+    top: ${USER_AREA_HEIGht + NAVIGATION_AREA_HEIGHT - 20}px;
     width: 100%;
-    height: 100%;
-    margin: 16px 4px;
+    height: 31%;
+    margin: 0px 4px;
 `;
 
 const RankingNumberInfo = styled.div`
     width: 100%;
-    height: 30px;
+    height: 15%;
     color: #fff;
 `;
 
 const RewardInfo = styled.div`
     width: 100%;
-    height: 30px;
+    height: 15%;
     color: #fff;
 `;
 
 const RankingSummaryInfo = styled.div`
     width: 100%;
-    height: 80px;
+    height: 55%;
     color: #fff;
 `;
 
-const DetailButton = styled.div`
-    width: 100%;
-    height: 30px;
-    color: #fff;
+const DetailButtonArea = styled.div`
+    width: 40%;
+    height: 15%;
+    margin: auto;
 `;
