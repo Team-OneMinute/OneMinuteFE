@@ -47,11 +47,10 @@ export const POST = async (req: NextRequest) => {
         reqObj.status === 'success' &&
         reqObj.contractAddress === nftContractAddress
     ) {
-        // request to change purchase flg and tokenId in firestore
-        // search smart contract address
         try {
             console.log(reqObj.walletAddress);
             console.log(reqObj.tokenIds);
+
         } catch {
             // TODO: fatal alert
             throw new Error('invalid request');
