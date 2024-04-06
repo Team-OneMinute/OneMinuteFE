@@ -16,7 +16,7 @@ import './styles.css';
 import { getAllActiveGames } from './service/game';
 import { getPoolsForObj } from './service/pool';
 import { getUser } from './service/user';
-import { authInitialize, getCredential, getToken } from './service/authentication';
+import { authInitialize, getCredential, getToken, isLoginSuccess } from './service/authentication';
 
 // slides
 import AllGamesSlide from './slides/AllGameSlide';
@@ -28,11 +28,9 @@ import GameDetailModal from './component/GameDetailModal';
 import NftPurchaseModal from './component/NftPurchaseModal';
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { StoreContext } from './store/StoreProvider';
-import { connect, getUserInfoOnChain } from './infrastructure/web3Auth/web3AuthConfig';
 import { Auth, getIdToken } from 'firebase/auth';
-import { connectWeb3Auth, fetchFirebaseAuth } from './store/StoreService';
 import { getCredentialStorage } from './service/credential';
-import { initAuth } from './service/initialize';
+import { initAuth } from './store/StoreService';
 
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
@@ -48,7 +46,7 @@ export default function App() {
     const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
     const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
     const [isOpenPurchaseModal, setIsOpenPurchaseModal] = useState<boolean>(false);
-    const [credential, setCredential] = useState<UserCredential | null>(null);
+    // const [credential, setCredential] = useState<UserCredential | null>(null);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     // const [auth, setAuth] = useState<Auth | undefined>(undefined);
@@ -213,8 +211,9 @@ export default function App() {
                 <>
                     <SwiperContainer>
                         <HeaderArea>
-                            {credential == null && logoutUserHeaderArea()}
-                            {credential != null && loginUserHeaderArea()}
+                            {firebaseAuth && firebaseAuth.currentUser && isLoginSuccess(firebaseAuth.currentUser)
+                                ? loginUserHeaderArea()
+                                : logoutUserHeaderArea()}
                         </HeaderArea>
                         <Swiper pagination={pagination} modules={[Pagination]}>
                             <SwiperSlide>

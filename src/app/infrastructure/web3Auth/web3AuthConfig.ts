@@ -65,18 +65,17 @@ export const init = async (web3Auth: Web3Auth) => {
 
 export const connect = async (web3Auth: Web3Auth, uid: string, idToken: string) => {
     console.log('start connect web3 auth');
-    const res = await web3Auth
-        .connect({
-            verifier: 'OneMinute-firebase-dev',
-            verifierId: uid,
-            idToken: idToken,
-        })
+    const res = await web3Auth.connect({
+        verifier: 'OneMinute-firebase-dev',
+        verifierId: uid,
+        idToken: idToken,
+    });
     return res;
 };
 
-export const logoutWeb3Auth = async (web3Auth: Web3Auth) => {
+export const logout = async (web3Auth: Web3Auth) => {
     // if (web3AuthSfa == null) return;
-    console.log("logoutWeb3Auth start");
+    console.log('logoutWeb3Auth start');
     await web3Auth.logout();
     console.log('logoutWeb3Auth end');
 };

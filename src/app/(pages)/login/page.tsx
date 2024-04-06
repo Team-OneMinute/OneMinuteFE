@@ -9,21 +9,24 @@ import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 
 // services
-import { getAuthUser, getAuthentication, logout } from '@/app/service/authentication';
-import { useRouter } from 'next/navigation';
+import { getAuthUser, getAuthentication } from '@/app/service/authentication';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { walletLogin } from '@/app/service/wallet';
 
 // tmp
 import { connect } from '@/app/infrastructure/web3Auth/web3AuthConfig';
 import { StoreContext } from '@/app/store/StoreProvider';
-import { initAuth } from '@/app/service/initialize';
-import { setFirebaseAuth } from '@/app/store/StoreService';
+import { initAuth, setFirebaseAuth } from '@/app/store/StoreService';
+
+type LoginStatus = 'logout' | 'login' | 'verify';
 
 // TODO: メールリンク認証によって飛んでくるメールのテンプレート変更
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const didLogRef = useRef<boolean>(false);
 
+    const status = searchParams.get('status');
     const [isLogin, setIsLogin] = useState<boolean>(false);
     const [isFailedVerify, setIsFailedVerify] = useState<boolean>(false);
 
@@ -54,15 +57,18 @@ export default function LoginPage() {
     };
 
     const verifyCheck = () => {
-        router.push('/'); // FIXME: 最新のverifyの値取得できず、top画面に戻れないバグ発生中。画面更新なりをして最新のverifyの値を取得できるようにする。暫定対処として強制top画面遷移
+        // router.push('/login?status=verifying');
+        window.location.href = 'login?status=verifying';
+        // window.location.reload();
+        // router.push('/login?verifying'); // FIXME: 最新のverifyの値取得できず、top画面に戻れないバグ発生中。画面更新なりをして最新のverifyの値を取得できるようにする。暫定対処として強制top画面遷移
         // verifyを取得
         // const authUser = getAuthUser();
-        const isVerify = firebaseAuth?.currentUser?.emailVerified;
-        if (isVerify) {
-            router.push('/');
-        } else {
-            setIsFailedVerify(true);
-        }
+        // const isVerify = firebaseAuth?.currentUser?.emailVerified;
+        // if (isVerify) {
+        //     router.push('/');
+        // } else {
+        //     setIsFailedVerify(true);
+        // }
     }
 
     useEffect(() => {
@@ -94,36 +100,38 @@ export default function LoginPage() {
                 }
             });
 
-            const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
-            ui.start('#firebaseui-auth-container', {
-                callbacks: {
-                    signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                        // TODO: redirect TOP page
-                        console.log('success login method');
-                        setFirebaseAuth(firebaseAuthDispatch, auth);
-                        initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
-                        // loginWallet(auth);
-                        //walletLogin(auth);
-                        return true;
+            if (!status) {
+                const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+                ui.start('#firebaseui-auth-container', {
+                    callbacks: {
+                        signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+                            // TODO: redirect TOP page
+                            console.log('success login method');
+                            setFirebaseAuth(firebaseAuthDispatch, auth);
+                            initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
+                            // loginWallet(auth);
+                            //walletLogin(auth);
+                            return true;
+                        },
+                        uiShown: function () {
+                            // This is what should happen when the form is full loaded. In this example, I hide the loader element.
+                            document.getElementById('loader')!.style.display = 'none';
+                        },
                     },
-                    uiShown: function () {
-                        // This is what should happen when the form is full loaded. In this example, I hide the loader element.
-                        document.getElementById('loader')!.style.display = 'none';
+                    //signInSuccessUrl: '/', // This is where should redirect if the sign in is successful.
+                    signInOptions: [
+                        // TODO: add twitter
+                        firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                        firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+                    ],
+                    tosUrl: 'https://www.example.com/terms-conditions', // URL to you terms and conditions.
+                    privacyPolicyUrl: function () {
+                        // TODO: add regal policy
+                        window.location.assign('https://www.example.com/privacy-policy');
                     },
-                },
-                //signInSuccessUrl: '/', // This is where should redirect if the sign in is successful.
-                signInOptions: [
-                    // TODO: add twitter
-                    firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-                ],
-                tosUrl: 'https://www.example.com/terms-conditions', // URL to you terms and conditions.
-                privacyPolicyUrl: function () {
-                    // TODO: add regal policy
-                    window.location.assign('https://www.example.com/privacy-policy');
-                },
-            });
+                });
+            }
         }
     }, []);
 
@@ -139,7 +147,7 @@ export default function LoginPage() {
                 </>
             )}
             // TODO: change loading image
-            <div id='loader'>Now Loading...</div>
+            <TempDiv id='loader'>Now Loading...</TempDiv>
             {/* <TempDiv onClick={() => logout(web3Auth)}> log out </TempDiv> */}
             <div onClick={() => router.push('/selectCharacter')}> select character </div>
         </Background>

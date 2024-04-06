@@ -57,8 +57,8 @@ interface Web3AuthState {
 //     isConnecting: false,
 // }
 
-type FirebaseAuthActionType = "REQUEST_FETCH" | "FINISH_FETCH";
-type Web3AuthActionType = "REQUEST_CONNECT" | "FINISH_CONNECT";
+type FirebaseAuthActionType = "REQUEST_FETCH" | "FINISH_FETCH" | "LOGOUT";
+type Web3AuthActionType = "REQUEST_CONNECT" | "FINISH_CONNECT" | "LOGOUT";
 export interface FirebaseAuthAction {
     type: FirebaseAuthActionType;
     payload?: FirebaseAuth;
@@ -75,13 +75,18 @@ const firebaseAuthReducer = (state: FirebaseAuthState, action: FirebaseAuthActio
                 ...state,
                 isFetching: true,
             }
-        case "FINISH_FETCH": {}
+        case "FINISH_FETCH":
             const payload = action.payload || null;
             return {
                 ...state,
                 firebaseAuth: payload,
                 isFetching: false,
             }
+        case "LOGOUT":
+            return {
+                ...state,
+                firebaseAuth: null,
+            };
         default:
             return {
                 ...state,
@@ -104,6 +109,11 @@ const web3AuthReducer = (state: Web3AuthState, action: Web3AuthAction): Web3Auth
                 web3Auth: payload,
                 isConnecting: false,
             }
+        case "LOGOUT":
+            return {
+                ...state,
+                web3Auth: null,
+            };
         default:
             return {
                 ...state,

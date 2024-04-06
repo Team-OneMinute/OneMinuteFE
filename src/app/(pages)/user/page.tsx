@@ -1,61 +1,84 @@
 'use client';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 
 // services
-import { getCredential, isLoginCheck, logout } from '@/app/service/authentication';
+import { getCredential, isLoginCheck, isLoginSuccess } from '@/app/service/authentication';
 import { getUser } from '@/app/service/user';
 import { getMyCharacter } from '@/app/service/character';
 
 // components
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { StoreContext } from '@/app/store/StoreProvider';
+import { initAuth, logoutAuth } from '@/app/store/StoreService';
 
 export default function UserPage() {
     const router = useRouter();
+    const didLogRef = useRef<boolean>(false);
+
     const [user, setUser] = useState<User>();
     const [isLogin, setIsLogin] = useState<boolean>(false);
-    const { web3Auth } = useContext(StoreContext);
-    console.log("user page start");
-    console.log(web3Auth);
-    console.log(web3Auth.sessionId);
+
+    const { firebaseAuthStore, web3AuthStore } = useContext(StoreContext);
+    const firebaseAuth = firebaseAuthStore.state.firebaseAuth;
+    const isFirebaseFetching = firebaseAuthStore.state.isFetching;
+    const firebaseAuthDispatch = firebaseAuthStore.dispatch;
+    const web3Auth = web3AuthStore.state.web3Auth;
+    const isWeb3AuthConnecting = web3AuthStore.state.isConnecting;
+    const web3AuthDispatch = web3AuthStore.dispatch;
+    const isFetching = isFirebaseFetching || isWeb3AuthConnecting;
+
+    // console.log("user page start");
+    // console.log(web3Auth);
+    // console.log(web3Auth.sessionId);
 
     useEffect(() => {
-        console.log("user page useEffect start");
-        // initWeb3Auth(web3AuthState);
-        const credential = getCredential();
-        setIsLogin(isLoginCheck(credential));
+        if (didLogRef.current === false) {
+            didLogRef.current = true;
+        } else {
+            console.log('user page useEffect start');
+            if (!isFetching) {
+                (async () => {
+                    await initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
+                })();
+            }
+            // initWeb3Auth(web3AuthState);
+            // const credential = getCredential();
+            // setIsLogin(isLoginCheck(credential));
 
-        // FIXME:ユーザ認証ができるまで、userId固定
-        // firebase function ができたら、コメント消して処理消す
-        // if (credential) {
-        //     const userData = await getUser(credential.uid);
-        //     await setUser(userData);
-        // }
-        const userId = '0001A';
-        (async () => {
-            const userData = await getUser(userId);
-            await setUser(userData);
-        })();
-        console.log('user page useEffect end');
+            // FIXME:ユーザ認証ができるまで、userId固定
+            // firebase function ができたら、コメント消して処理消す
+            // if (credential) {
+            //     const userData = await getUser(credential.uid);
+            //     await setUser(userData);
+            // }
+            const userId = '0001A';
+            (async () => {
+                const userData = await getUser(userId);
+                await setUser(userData);
+            })();
+            console.log('user page useEffect end');
+         }
     }, []);
 
-    const getNftData = () => {
-        // TODO: type
-        const mail = 'takeuma.com@example.com';
-        const nftData = getMyCharacter(mail);
-    };
+    // const getNftData = () => {
+    //     // TODO: type
+    //     const mail = 'takeuma.com@example.com';
+    //     const nftData = getMyCharacter(mail);
+    // };
 
     const logoutClick = () => {
-        logout(web3Auth);
-        router.push('/');
+        if (web3Auth) {
+            logoutAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
+            router.push('/');
+        }
     };
 
     return (
         <>
             <Background>
-                {isLogin ? (
+                {firebaseAuth && firebaseAuth.currentUser && isLoginSuccess(firebaseAuth.currentUser) ? (
                     <>
                         <HeaderArea>
                             <LogoutButtonArea>
@@ -78,7 +101,7 @@ export default function UserPage() {
                         <HistoryArea>
                             <SubTitle>History</SubTitle>
                         </HistoryArea>
-                        <div onClick={() => getNftData()}>data fetch</div>
+                        {/* <div onClick={() => getNftData()}>data fetch</div> */}
                     </>
                 ) : (
                     <>
