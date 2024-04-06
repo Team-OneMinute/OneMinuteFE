@@ -9,7 +9,7 @@ interface Props {
 
 const NftPurchaseModal: React.FC<Props> = ({ closeModal }) => {
     const projectId = '412da5ae-a860-4cb3-9969-55948e5c327f';
-    const collectionId = 'a221d4ac-0f9a-4205-bc61-a7816c5963ea';
+    const collectionId = '9c4490e9-e795-4280-b138-85ffe2c64910';
     const environment = 'staging';
     const myWalletAddress = '0x4dC65015ce1c7CfC5Cb62d37051a888aa0FEA757'; // TODO: Crossmintのwalletアドレスを取得して渡すようにする
 
@@ -24,10 +24,10 @@ const NftPurchaseModal: React.FC<Props> = ({ closeModal }) => {
                         collectionId={collectionId}
                         environment={environment}
                         mintConfig={{
-                            type: 'erc-721',
-                            totalPrice: '0.0003',
+                            quantity: '1',
+                            type: 'managed-erc-721',
                         }}
-                        onClick={() => false}
+                        checkoutProps={{ paymentMethods: ['fiat', 'ETH', 'SOL'] }}
                     />
                 </PaymentButtonArea>
             </Content>
