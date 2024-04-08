@@ -4,14 +4,14 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 
 // services
-import { getCredential, isLoginCheck, isLoginSuccess } from '@/app/service/authentication';
+import { getCredential, isLoginCheck, isLoginSuccess, signOutApp } from '@/app/service/authentication/authentication';
 import { getUser } from '@/app/service/user';
 import { getMyCharacter } from '@/app/service/character';
 
 // components
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { StoreContext } from '@/app/store/StoreProvider';
-import { initAuth, logoutAuth } from '@/app/store/StoreService';
+import { initAuth } from '@/app/store/StoreService';
 
 export default function UserPage() {
     const router = useRouter();
@@ -59,7 +59,7 @@ export default function UserPage() {
                 await setUser(userData);
             })();
             console.log('user page useEffect end');
-         }
+        }
     }, []);
 
     // const getNftData = () => {
@@ -69,8 +69,9 @@ export default function UserPage() {
     // };
 
     const logoutClick = () => {
+        // TODO: change isLogin
         if (web3Auth) {
-            logoutAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
+            signOutApp(firebaseAuthStore, web3AuthStore);
             router.push('/');
         }
     };

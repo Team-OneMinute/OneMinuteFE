@@ -5,7 +5,7 @@ import { Puff } from 'react-loader-spinner';
 
 // service
 import { ButtonBase } from '@/app/component/Atoms/Button';
-import { getCredential } from '@/app/service/authentication';
+import { getCredential } from '@/app/service/authentication/authentication';
 import { selectCharacter } from '@/app/service/character';
 import { getUser, setCharacterFlgInUser } from '@/app/service/user';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,7 @@ export default function SelectCharacterPage() {
     const [submitCharacter, setSubmitCharacter] = useState<boolean>(false);
     const [mintLoading, setMintLoading] = useState<boolean>(false);
     const characterNum = 4;
-    const [tokenId, setTokenId] = useState<string>("");
+    const [tokenId, setTokenId] = useState<string>('');
 
     const tmpPathHead = '/static/images/temp/character/character';
     const tmpPathTail = '.png';
@@ -45,7 +45,7 @@ export default function SelectCharacterPage() {
     }, []);
 
     useEffect(() => {
-        if (tokenId != "") {
+        if (tokenId != '') {
             setMintLoading(false);
         }
     }, [tokenId]);
@@ -80,7 +80,6 @@ export default function SelectCharacterPage() {
         const tokenId = result.relayResponse.tokenId;
         setTokenId(tokenId);
         const baseUrl = result.baseUrl;
-
     };
 
     const modalOnclickHandler = () => {
@@ -104,17 +103,17 @@ export default function SelectCharacterPage() {
             <InfoArea>
                 <InfoText>character info</InfoText>
             </InfoArea>
-                <LoadingArea>
-                    <Puff
-                        visible={mintLoading}
-                        height='80'
-                        width='80'
-                        color='#4fa94d'
-                        ariaLabel='puff-loading'
-                        wrapperStyle={{}}
-                        wrapperClass=''
-                    />
-                </LoadingArea>
+            <LoadingArea>
+                <Puff
+                    visible={mintLoading}
+                    height='80'
+                    width='80'
+                    color='#4fa94d'
+                    ariaLabel='puff-loading'
+                    wrapperStyle={{}}
+                    wrapperClass=''
+                />
+            </LoadingArea>
             {tokenId != '' && mintLoading == false && (
                 <SelectedCharacterModal
                     title='Congratulation'
@@ -202,9 +201,9 @@ const ButtonArea = styled.div`
 
 const LoadingArea = styled.div`
     position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
 `;

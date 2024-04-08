@@ -9,12 +9,12 @@ import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 
 // services
-import { getAuthUser, getAuthentication } from '@/app/service/authentication';
+import { getAuthUser, getAuthentication } from '@/app/service/authentication/authentication';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { walletLogin } from '@/app/service/wallet';
 
 // tmp
-import { connect } from '@/app/infrastructure/web3Auth/web3AuthConfig';
+import { connect } from '@/app/infrastructure/web3Auth/web3Auth';
 import { StoreContext } from '@/app/store/StoreProvider';
 import { initAuth, setFirebaseAuth } from '@/app/store/StoreService';
 
@@ -69,7 +69,7 @@ export default function LoginPage() {
         // } else {
         //     setIsFailedVerify(true);
         // }
-    }
+    };
 
     useEffect(() => {
         if (didLogRef.current === false) {

@@ -2,9 +2,10 @@ import { PrivateKeyProvider, Web3Auth, Web3AuthOptions } from '@web3auth/single-
 import { CHAIN_NAMESPACES, IProvider } from '@web3auth/base';
 import { EthereumPrivateKeyProvider } from '@web3auth/ethereum-provider';
 import { signInWithEmailLink, isSignInWithEmailLink, sendSignInLinkToEmail } from 'firebase/auth';
-import { getAuthentication } from '@/app/service/authentication';
+import { getAuthentication } from '@/app/service/authentication/authentication';
 //import { useAuthState } from 'react-firebase-hooks/auth';
 import { Contract, Eip1193Provider, ethers, getDefaultProvider } from 'ethers';
+import { Web3AuthStore } from '@/app/store/StoreProvider';
 
 // TODO: add env file
 const clientId = 'BDvwsfMRP29PwNqUbOStvQiLlCeJrGYfxxzbbJ7CwW1IeVp37nISy9NGIrWwM_yuUgXm5yWvvHednxBEPxoGguQ';
@@ -73,36 +74,40 @@ export const connect = async (web3Auth: Web3Auth, uid: string, idToken: string) 
     return res;
 };
 
-export const logout = async (web3Auth: Web3Auth) => {
-    // if (web3AuthSfa == null) return;
-    console.log('logoutWeb3Auth start');
+export const logoutWeb3Auth = async (web3AuthStore: Web3AuthStore) => {
+    const web3Auth = web3AuthStore.state.web3Auth;
+    if (!web3Auth) {
+        return;
+    }
     await web3Auth.logout();
-    console.log('logoutWeb3Auth end');
+        const web3AuthDispatch = web3AuthStore.dispatch;
+        web3AuthDispatch({ type: 'LOGOUT' });
+
 };
 
-export const getUserInfoOnChain = async (web3authSfa: Web3Auth): Promise<string> => {
-    console.log('wallet check');
-    console.log(web3authSfa);
-    console.log(web3authSfa.provider);
-    const ethersProvider = new ethers.BrowserProvider(web3authSfa.provider as Eip1193Provider);
-    const signer = await ethersProvider.getSigner();
+// export const getUserInfoOnChain = async (web3authSfa: Web3Auth): Promise<string> => {
+//     console.log('wallet check');
+//     console.log(web3authSfa);
+//     console.log(web3authSfa.provider);
+//     const ethersProvider = new ethers.BrowserProvider(web3authSfa.provider as Eip1193Provider);
+//     const signer = await ethersProvider.getSigner();
 
-    // Get the user's Ethereum public address
-    const userWalletAddress = await signer.getAddress();
-    console.log(userWalletAddress);
-    return userWalletAddress;
-};
+//     // Get the user's Ethereum public address
+//     const userWalletAddress = await signer.getAddress();
+//     console.log(userWalletAddress);
+//     return userWalletAddress;
+// };
 
-const getSymbol = async (web3authSfa: Web3Auth) => {
-    const abi = [
-        'function decimals() view returns (uint8)',
-        'function symbol() view returns (string)',
-        'function balanceOf(address a) view returns (uint)',
-    ];
-    const ethersProvider = new ethers.BrowserProvider(web3authSfa.provider as Eip1193Provider);
-    // Create a contract; connected to a Provider, so it may
-    // only access read-only methods (like view and pure)
-    const contract = new Contract('dai.tokens.ethers.eth', abi, ethersProvider);
-    const sym = await contract.symbol();
-    console.log(sym);
-};
+// const getSymbol = async (web3authSfa: Web3Auth) => {
+//     const abi = [
+//         'function decimals() view returns (uint8)',
+//         'function symbol() view returns (string)',
+//         'function balanceOf(address a) view returns (uint)',
+//     ];
+//     const ethersProvider = new ethers.BrowserProvider(web3authSfa.provider as Eip1193Provider);
+//     // Create a contract; connected to a Provider, so it may
+//     // only access read-only methods (like view and pure)
+//     const contract = new Contract('dai.tokens.ethers.eth', abi, ethersProvider);
+//     const sym = await contract.symbol();
+//     console.log(sym);
+// };

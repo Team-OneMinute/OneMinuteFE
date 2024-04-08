@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '@/app/service/user';
 import { getGameScoreForSnapOrderScore, transferScoreObj, updateScoreByGameId } from '@/app/service/score';
 import { updateRanking, getBeforeRankingNo, getNewRankingNo, isUpRanking } from '@/app/service/ranking';
-import { getCredential } from '@/app/service/authentication';
+import { getCredential } from '@/app/service/authentication/authentication';
 import TestGameCanvas from '@/app/gameComponents/Canvas/TestGameCanvas';
 
 export default function GamePlayingPage() {

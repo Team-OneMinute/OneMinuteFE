@@ -1,10 +1,10 @@
 import { Auth } from 'firebase/auth';
 
 // service
-import { getToken } from './authentication';
+import { getToken } from './authentication/authentication';
 
 // infrastructure
-import { connectWeb3Auth } from '@/app/infrastructure/web3Auth/web3AuthConfig'; 
+import { connectWeb3Auth } from '@/app/infrastructure/web3Auth/web3Auth';
 
 export const walletLogin = async (auth: Auth) => {
     if (auth.currentUser == null) return;
