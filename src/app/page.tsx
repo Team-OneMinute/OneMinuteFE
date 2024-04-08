@@ -16,7 +16,7 @@ import './styles.css';
 import { getAllActiveGames } from './service/game';
 import { getPoolsForObj } from './service/pool';
 import { getUser } from './service/user';
-import { authInitialize, getCredential, getToken, isLoginSuccess } from './service/authentication';
+import { isLoginSuccess } from './service/authentication/authentication';
 
 // slides
 import AllGamesSlide from './slides/AllGameSlide';
@@ -78,6 +78,7 @@ export default function App() {
     const topPageInitialized = async (): Promise<void> => {
         console.log('topPageInitialized start');
 
+        
         if (!isFetching) {
             await initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
         }

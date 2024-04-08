@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '@/app/service/user';
 import { getGameScoreForSnapOrderScore, transferScoreObj, updateScoreByGameId } from '@/app/service/score';
 import { updateRanking, getBeforeRankingNo, getNewRankingNo, isUpRanking } from '@/app/service/ranking';
-import { getCredential } from '@/app/service/authentication';
+import { getCredential } from '@/app/service/authentication/authentication';
 
 export default function GamePlayingPage() {
     // TODO: 右スワイプでTOP画面に戻れる問題あり
