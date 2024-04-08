@@ -9,6 +9,7 @@ import { getUser } from '@/app/service/user';
 import { getGameScoreForSnapOrderScore, transferScoreObj, updateScoreByGameId } from '@/app/service/score';
 import { updateRanking, getBeforeRankingNo, getNewRankingNo, isUpRanking } from '@/app/service/ranking';
 import { getCredential } from '@/app/service/authentication';
+import TestGameCanvas from '@/app/gameComponents/Canvas/TestGameCanvas';
 
 export default function GamePlayingPage() {
     // TODO: 右スワイプでTOP画面に戻れる問題あり
@@ -52,12 +53,12 @@ export default function GamePlayingPage() {
 
     switch (gameId) {
         case '0001':
-            return <GameCanvas />;
+            return <TestGameCanvas backAction={() => router.push('/')} finalize={finalize} />;
         case '0002':
-            return <GameCanvas2 backAction={() => router.push('/')} finalize={finalize} />;
+            return <TestGameCanvas backAction={() => router.push('/')} finalize={finalize} />;
         case '0003':
-            return <GameCanvas />;
+            return <TestGameCanvas backAction={() => router.push('/')} finalize={finalize} />;
         default: // TODO: クライアントで設定していないgameId、またはURLにgameIdがない場合の処理
-            return <GameCanvas />;
+            return <TestGameCanvas backAction={() => router.push('/')} finalize={finalize} />;
     }
 }
