@@ -16,7 +16,9 @@ import './styles.css';
 import { getAllActiveGames } from './service/game';
 import { getPoolsForObj } from './service/pool';
 import { getUser } from './service/user';
-import { isLoginSuccess } from './service/authentication/authentication';
+import { loginStatus } from './service/authentication/authentication';
+import { StoreContext } from './store/StoreProvider';
+import { initAuth } from '@/app/service/authentication/authentication';
 
 // slides
 import AllGamesSlide from './slides/AllGameSlide';
@@ -27,10 +29,9 @@ import { getGameScoreForObj } from './service/score';
 import GameDetailModal from './component/GameDetailModal';
 import NftPurchaseModal from './component/NftPurchaseModal';
 import { ButtonBase } from '@/app/component/Atoms/Button';
-import { StoreContext } from './store/StoreProvider';
-import { Auth, getIdToken } from 'firebase/auth';
-import { getCredentialStorage } from './service/credential';
-import { initAuth } from './store/StoreService';
+
+// Type
+import { LoginStatus } from '@/app/types/LoginStatus';
 
 const pageName = ['ALL', 'ACTION', 'BATTLE', 'SHOOTING', 'PUZZLE'];
 
@@ -46,19 +47,12 @@ export default function App() {
     const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
     const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
     const [isOpenPurchaseModal, setIsOpenPurchaseModal] = useState<boolean>(false);
-    // const [credential, setCredential] = useState<UserCredential | null>(null);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
-    // const [auth, setAuth] = useState<Auth | undefined>(undefined);
 
     const { firebaseAuthStore, web3AuthStore } = useContext(StoreContext);
+
     const firebaseAuth = firebaseAuthStore.state.firebaseAuth;
-    const isFirebaseFetching = firebaseAuthStore.state.isFetching;
-    const firebaseAuthDispatch = firebaseAuthStore.dispatch;
-    const web3Auth = web3AuthStore.state.web3Auth;
-    const isWeb3AuthConnecting = web3AuthStore.state.isConnecting;
-    const web3AuthDispatch = web3AuthStore.dispatch;
-    const isFetching = isFirebaseFetching || isWeb3AuthConnecting;
 
     const pagination = {
         clickable: true,
@@ -77,11 +71,7 @@ export default function App() {
 
     const topPageInitialized = async (): Promise<void> => {
         console.log('topPageInitialized start');
-
-        
-        if (!isFetching) {
-            await initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
-        }
+        await initAuth(firebaseAuthStore, web3AuthStore);
 
         const gameList = await getAllActiveGames();
         const sortedGameList = await gameList.sort((a, b) => a.topAmount - b.topAmount);
@@ -97,21 +87,6 @@ export default function App() {
     const afterInitialized = async () => {
         console.log('initialized started');
         if (initialized == true) {
-            // credential init
-            // console.log('credential check start');
-            // const tmpCredential = getCredential();
-            // console.log('credential');
-            // console.log(tmpCredential);
-            // if (tmpCredential != null) {
-            //     // TODO: log in dev environments only
-            //     setCredential(tmpCredential);
-
-            //     console.log('start user data fetch');
-            //     const userData = await getUser(tmpCredential.uid);
-            //     console.log('user');
-            //     console.log(userData);
-            //     await setUser(userData);
-            // }
             const firebaseUser = firebaseAuth?.currentUser;
             if (firebaseUser != null) {
                 const userData = await getUser(firebaseUser.uid);
@@ -119,7 +94,6 @@ export default function App() {
                 console.log(userData);
                 await setUser(userData);
             }
-
             // TODO: other game fetch and add store
             setLoading(false);
         }
@@ -141,6 +115,11 @@ export default function App() {
     }, [initialized]);
 
     useEffect(() => {
+        console.log(firebaseAuthStore.state.firebaseAuth?.currentUser);
+        topPageInitialized();
+    }, [firebaseAuthStore.state.firebaseAuth?.currentUser]);
+
+    useEffect(() => {
         (async () => {
             // TODO: add data in store or storage
             // TODO: add delay fetch for gating other game data, and add store or storage.
@@ -149,7 +128,6 @@ export default function App() {
                 const poolList = await getPoolsForObj(selectedGameId);
                 const rankingList = await getGameScoreForObj(selectedGameId);
                 setRankings(rankingList.sort((a, b) => a.score - b.score));
-
                 setPools(poolList); // already sorted by top amount
             }
         })();
@@ -166,6 +144,23 @@ export default function App() {
 
     const selectCharacterClick = () => {
         router.push('/selectCharacter');
+    };
+
+    const getFirebaseContext = () => {
+        console.log(firebaseAuthStore);
+    }
+
+    const headerHandler = () => {
+        const status = loginStatus(firebaseAuthStore, web3AuthStore);
+        console.log(status);
+        switch (status) {
+            case LoginStatus.Login:
+                return loginUserHeaderArea();
+            case LoginStatus.Logout:
+                return logoutUserHeaderArea();
+            default:
+                return <div onClick={() => getFirebaseContext()}>get firebase context</div>;
+        }
     };
 
     const loginUserHeaderArea = () => {
@@ -188,7 +183,6 @@ export default function App() {
 
     const logoutUserHeaderArea = () => {
         return (
-            // TODO:無課金ユーザ用画像用意
             <>
                 <UserArea onClick={() => router.push('/user')}>
                     <UserNftImg src='/static/images/temp/character/Defaultcharacter.png' />
@@ -208,14 +202,10 @@ export default function App() {
                 wrapperStyle={{}}
                 wrapperClass='dna-wrapper'
             />
-            {!loading && !isFetching && (
+            {!loading && (
                 <>
                     <SwiperContainer>
-                        <HeaderArea>
-                            {firebaseAuth && firebaseAuth.currentUser && isLoginSuccess(firebaseAuth.currentUser)
-                                ? loginUserHeaderArea()
-                                : logoutUserHeaderArea()}
-                        </HeaderArea>
+                        <HeaderArea>{headerHandler()}</HeaderArea>
                         <Swiper pagination={pagination} modules={[Pagination]}>
                             <SwiperSlide>
                                 <AllGamesSlide

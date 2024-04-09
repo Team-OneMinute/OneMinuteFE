@@ -4,29 +4,27 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 
 // services
-import { getCredential, isLoginCheck, isLoginSuccess, signOutApp } from '@/app/service/authentication/authentication';
+import { loginStatus, signOutApp } from '@/app/service/authentication/authentication';
 import { getUser } from '@/app/service/user';
 import { getMyCharacter } from '@/app/service/character';
 
 // components
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { StoreContext } from '@/app/store/StoreProvider';
-import { initAuth } from '@/app/store/StoreService';
+import { initAuth } from '@/app/service/authentication/authentication';
+// Type
+import { LoginStatus } from '@/app/types/LoginStatus';
 
 export default function UserPage() {
     const router = useRouter();
     const didLogRef = useRef<boolean>(false);
 
     const [user, setUser] = useState<User>();
-    const [isLogin, setIsLogin] = useState<boolean>(false);
 
     const { firebaseAuthStore, web3AuthStore } = useContext(StoreContext);
-    const firebaseAuth = firebaseAuthStore.state.firebaseAuth;
     const isFirebaseFetching = firebaseAuthStore.state.isFetching;
-    const firebaseAuthDispatch = firebaseAuthStore.dispatch;
     const web3Auth = web3AuthStore.state.web3Auth;
     const isWeb3AuthConnecting = web3AuthStore.state.isConnecting;
-    const web3AuthDispatch = web3AuthStore.dispatch;
     const isFetching = isFirebaseFetching || isWeb3AuthConnecting;
 
     // console.log("user page start");
@@ -40,7 +38,7 @@ export default function UserPage() {
             console.log('user page useEffect start');
             if (!isFetching) {
                 (async () => {
-                    await initAuth(firebaseAuthDispatch, web3AuthDispatch, firebaseAuth, web3Auth);
+                    await initAuth(firebaseAuthStore, web3AuthStore);
                 })();
             }
             // initWeb3Auth(web3AuthState);
@@ -62,12 +60,18 @@ export default function UserPage() {
         }
     }, []);
 
-    // const getNftData = () => {
-    //     // TODO: type
-    //     const mail = 'takeuma.com@example.com';
-    //     const nftData = getMyCharacter(mail);
-    // };
-
+    const loginHandler = () => {
+        const status = loginStatus(firebaseAuthStore, web3AuthStore);
+        console.log(status);
+        switch (status) {
+            case LoginStatus.Login:
+                return true;
+            case LoginStatus.Logout:
+                return false;
+            default:
+                return false;
+        }
+    };
     const logoutClick = () => {
         // TODO: change isLogin
         if (web3Auth) {
@@ -79,7 +83,7 @@ export default function UserPage() {
     return (
         <>
             <Background>
-                {firebaseAuth && firebaseAuth.currentUser && isLoginSuccess(firebaseAuth.currentUser) ? (
+                {loginHandler() ? (
                     <>
                         <HeaderArea>
                             <LogoutButtonArea>

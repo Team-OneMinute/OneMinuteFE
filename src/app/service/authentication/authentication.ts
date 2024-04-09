@@ -1,96 +1,65 @@
-// Import the functions you need from the SDKs
-import { initializeApp } from 'firebase/app';
-import firebase from 'firebase/compat/app';
-import {
-    getIdToken,
-    Auth,
-    signOut,
-    User as AuthUser,
-    getAuth as getAuthFromFirebase,
-    onAuthStateChanged,
-    User,
-} from 'firebase/auth';
-import { firebaseConfig } from '@/app/infrastructure/firebase/firebaseConfig';
-
 // services
-import { getCredentialStorage, setCredentialStorage, removeCredentialStorage } from '@/app/service/credential';
-//import { logout } from '../../infrastructure/web3Auth/web3Auth';
-import Web3Auth from '@web3auth/single-factor-auth';
-import { Dispatch } from 'react';
-import { FirebaseAuthAction, FirebaseAuthStore, Web3AuthAction, Web3AuthStore } from '../../store/StoreProvider';
-//import { connectWeb3Auth, fetchFirebaseAuth, logoutFirebaseAuth } from '../../store/StoreService';
-import { signOutFirebaseAuth } from '../../infrastructure/firebase/firebaseAuth';
-import { signOutUser } from './userAuthService';
-import { logoutWallet } from './walletAuthService';
+import { FirebaseAuthStore, Web3AuthStore } from '../../store/StoreProvider';
+import { getUserAuth, signOutUser, userAuthInit } from './userAuthService';
+import { getWalletAuth, logoutWallet, walletAuthInit } from './walletAuthService';
+import { LoginStatus } from '@/app/types/LoginStatus';
 
-export const getAuthentication = () => {
-    console.log('in getAuthentication');
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = getAuthFromFirebase(app);
-    return auth;
-};
 
-// export const authInitialize = (paramAuth: Auth) => {
-//     const auth = paramAuth;
+export const loginStatus = (firebaseAuthStore: FirebaseAuthStore, web3AuthStore: Web3AuthStore) => {
+    const firebaseAuth = firebaseAuthStore.state.firebaseAuth;
+    const web3Auth = web3AuthStore.state.web3Auth;
+    const isFirebaseFetching = firebaseAuthStore.state.isFetching;
+    const isWeb3AuthConnecting = web3AuthStore.state.isConnecting;
 
-//     // get user credential from firebase authentication
-//     onAuthStateChanged(auth, (user) => {
-//         if (user) {
-//             console.log('onAuthStateChanged: userGet');
-//             console.log(user);
-//             // TODO: change secure code
-//             const userCredential = getCredentialStorage();
-//             if (
-//                 userCredential == null ||
-//                 user.uid != userCredential.uid ||
-//                 user.emailVerified != userCredential.isLogin
-//             ) {
-//                 setCredentialStorage({
-//                     uid: user.uid,
-//                     isLogin: isLoginSuccess(user),
-//                 });
-//                 // return user;
-//             }
-//         }
-//     });
-// };
-
-export const isLoginSuccess = (user: AuthUser): boolean => {
-    return !!(user.uid && user.emailVerified == true);
-};
-
-export const isLoginCheck = (credential: UserCredential | undefined) => {
-    if (!credential) {
-        return false;
+    // page reload caused reFetching and reConnecting.
+    // This timing is context data initializing.
+    // So, not login status.
+    if (isFirebaseFetching === true || isWeb3AuthConnecting == true) {
+        console.log('is connecting');
+        return LoginStatus.Connecting;
     }
-    return credential.isLogin;
-};
 
-export const getCredential = () => {
-    return getCredentialStorage();
-};
+    // not login user
+    if (firebaseAuth === null || web3Auth == null) {
+        console.log('no auth');
+        return LoginStatus.Logout;
+    } else if (firebaseAuth.currentUser === null || firebaseAuth.currentUser === undefined) {
+        console.log('no current user');
+        return LoginStatus.Logout;
+    }
 
-export const getToken = async (user: User) => {
-    const token = await getIdToken(user, true);
-    return token;
-};
-
-export const getAuthUser = (paramAuth?: Auth): AuthUser | null => {
-    const auth = paramAuth || getAuthentication();
-    console.log(auth);
-    const user = auth.currentUser;
-    console.log(user);
-    return user;
+    // This app Login state is defined Multi-factor authentication
+    // verification success is login status!
+    if (firebaseAuth.currentUser.uid && firebaseAuth.currentUser.emailVerified == true) {
+        console.log('is login now!!');
+        return LoginStatus.Login;
+    } else {
+        console.log('not login other reason');
+        return LoginStatus.Logout;
+    }
 };
 
 export const signOutApp = async (firebaseAuthStore: FirebaseAuthStore, web3AuthStore: Web3AuthStore) => {
-    // TODO: remove session storage
-    
     if (firebaseAuthStore.state.firebaseAuth) {
         await signOutUser(firebaseAuthStore);
     }
-
     if (web3AuthStore.state.web3Auth) {
         await logoutWallet(web3AuthStore);
     }
+};
+
+export const initAuth = async (firebaseAuthStore: FirebaseAuthStore, web3AuthStore: Web3AuthStore) => {
+    const userAuth = getUserAuth(firebaseAuthStore);
+    const walletAuth = getWalletAuth(web3AuthStore);
+
+    if (!userAuth) {
+        userAuthInit(firebaseAuthStore);
+        return;
+    } else if (!walletAuth) {
+        if (!userAuth.currentUser) {
+            return;
+        }
+        await walletAuthInit(firebaseAuthStore, web3AuthStore, userAuth);
+    }
+
 };

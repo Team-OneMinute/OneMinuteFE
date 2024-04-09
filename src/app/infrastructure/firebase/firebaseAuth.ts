@@ -1,13 +1,8 @@
-import { Auth, getAuth, signOut } from "firebase/auth";
-import { FirebaseAuthAction, FirebaseAuthStore, Web3AuthAction } from '../../store/StoreProvider';
+import { Auth, getAuth, signOut } from 'firebase/auth';
+import { FirebaseAuthAction, FirebaseAuthStore } from '../../store/StoreProvider';
 import { Dispatch } from 'react';
-
-export const getAuthUser = () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    console.log(user);
-    return user;
-}
+import firebase from 'firebase/compat/app';
+import { firebaseConfig } from '@/app/infrastructure/firebase/firebaseConfig';
 
 export const signOutFirebaseAuth = async (firebaseAuthStore: FirebaseAuthStore) => {
     const firebaseAuth = firebaseAuthStore.state.firebaseAuth;
@@ -17,4 +12,22 @@ export const signOutFirebaseAuth = async (firebaseAuthStore: FirebaseAuthStore) 
     }
     await signOut(firebaseAuth);
     firebaseAuthDispatch({ type: 'LOGOUT' });
+};
+
+export const fetchFirebaseAuth = (dispatch: Dispatch<FirebaseAuthAction>) => {
+    dispatch({ type: 'REQUEST_FETCH' });
+    const firebaseAuth = getAuthentication();
+    console.log(firebaseAuth);
+    dispatch({ type: 'FINISH_FETCH', payload: firebaseAuth });
+};
+
+export const setFirebaseAuth = (dispatch: Dispatch<FirebaseAuthAction>, firebaseAuth: Auth) => {
+    // TODO: 本来isFetchingはそのままに、firebaseAuthの値だけ更新するREQUEST_SETなどを用意するのが正しい作り
+    dispatch({ type: 'FINISH_FETCH', payload: firebaseAuth });
+};
+
+export const getAuthentication = () => {
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    return auth;
 };
