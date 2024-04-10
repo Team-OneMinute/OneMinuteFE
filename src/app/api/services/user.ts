@@ -21,3 +21,11 @@ export const setUserWalletAddress = (uid: string, address: string) => {
     };
     setUserData(uid, updateUserData);
 };
+
+export const setCharacterNftTokenId = (uid: string, tokenId: number) => {
+    console.log('start setCharacterNftTokenId');
+    const updateUserData = {
+        character_nft_token_id: tokenId,
+    };
+    setUserData(uid, updateUserData);
+}

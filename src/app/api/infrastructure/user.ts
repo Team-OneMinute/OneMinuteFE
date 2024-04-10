@@ -15,7 +15,7 @@ export const getUserData = async (uid: string) => {
         totalClaimed: Number(userSnap!.total_claimed),
         mailAddress: String(userSnap!.mail_address),
         walletAddress: String(userSnap!.wallet_address),
-        characterNftFlg: Boolean(userSnap!.character_nft_flg),
+        characterNftTokenId: Number(userSnap!.character_nft_token_id),
     };
     return userData;
 };

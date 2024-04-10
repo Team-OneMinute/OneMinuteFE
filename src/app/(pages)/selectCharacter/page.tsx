@@ -6,7 +6,7 @@ import { Puff } from 'react-loader-spinner';
 // service
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { selectCharacter } from '@/app/service/character';
-import { getUser, setCharacterFlgInUser } from '@/app/service/user';
+import { getUser } from '@/app/service/user';
 import { useRouter } from 'next/navigation';
 
 // component
@@ -81,7 +81,6 @@ export default function SelectCharacterPage() {
     };
 
     const selectedCharacter = async () => {
-        setCharacterFlgInUser(user!.docNo);
         setSubmitCharacter(true);
 
         // TODO: Web3Auth get
