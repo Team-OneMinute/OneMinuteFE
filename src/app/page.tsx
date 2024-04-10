@@ -92,7 +92,7 @@ export default function App() {
                 const userData = await getUser(firebaseUser.uid);
                 console.log('user');
                 console.log(userData);
-                await setUser(userData);
+                setUser(userData);
             }
             // TODO: other game fetch and add store
             setLoading(false);

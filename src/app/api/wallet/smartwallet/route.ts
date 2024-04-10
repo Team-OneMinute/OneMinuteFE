@@ -30,7 +30,7 @@ export const GET = async (req: NextRequest) => {
             salt
         );
         if (!smartWalletAddress || smartWalletAddress == "") {
-            return NextResponse.json(""); 
+            return NextResponse.json("");
         }
             return NextResponse.json(smartWalletAddress);
     } catch (err) {

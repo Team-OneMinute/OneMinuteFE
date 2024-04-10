@@ -6,7 +6,7 @@ import { fireStoreInitialized } from '@/app/infrastructure/firebase/firestore';
  * Fetch user
  * @param userId userId
  */
-export const getUser = async (userId: string) => {
+export const getUser = async (userId: string): Promise<User> => {
     const db = initialize();
 
     const userRef = collection(db, 'users');
