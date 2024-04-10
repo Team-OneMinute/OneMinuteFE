@@ -10,10 +10,12 @@ export const getUserData = async (uid: string) => {
         userId: String(userSnap!.user_id),
         name: String(userSnap!.name),
         life: Number(userSnap!.life),
+        lifeNftTokenId: Number(userSnap!.life_nft_token_id),
         claimableReward: Number(userSnap!.claimable_reward),
         totalClaimed: Number(userSnap!.total_claimed),
         mailAddress: String(userSnap!.mail_address),
-        purchasedNftFlg: Boolean(userSnap!.purchased_nft_flg),
+        walletAddress: String(userSnap!.wallet_address),
+        characterNftTokenId: Number(userSnap!.character_nft_token_id),
     };
     return userData;
 };

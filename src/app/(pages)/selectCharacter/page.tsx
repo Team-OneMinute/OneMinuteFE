@@ -6,7 +6,7 @@ import { Puff } from 'react-loader-spinner';
 // service
 import { ButtonBase } from '@/app/component/Atoms/Button';
 import { selectCharacter } from '@/app/service/character';
-import { getUser, setCharacterFlgInUser } from '@/app/service/user';
+import { getUser } from '@/app/service/user';
 import { useRouter } from 'next/navigation';
 
 // component
@@ -14,6 +14,7 @@ import { SelectedCharacterModal } from '@/app/component/SelectedCharacterModal';
 import { StoreContext } from '@/app/store/StoreProvider';
 import { getLoginUser, getUserAuth } from '@/app/service/authentication/userAuthService';
 import { initAuth } from '@/app/service/authentication/authentication';
+import { getWalletAddress } from '@/app/infrastructure/web3Auth/web3Auth';
 
 export default function SelectCharacterPage() {
     const router = useRouter();
@@ -80,11 +81,13 @@ export default function SelectCharacterPage() {
     };
 
     const selectedCharacter = async () => {
-        setCharacterFlgInUser(user!.docNo);
         setSubmitCharacter(true);
 
         // TODO: Web3Auth get
-        const walletAddress = '0x18aEFe337E68f5Bd3e18Ba09960f9136754590a6';
+        // const walletAddress = '0x18aEFe337E68f5Bd3e18Ba09960f9136754590a6';
+        const walletAddress = await getWalletAddress(web3AuthStore);
+        console.log('getWalletAddress');
+        console.log(walletAddress);
 
         setMintLoading(true);
         const result = await selectCharacter(user!.userId, walletAddress, String(selectedImgID));
