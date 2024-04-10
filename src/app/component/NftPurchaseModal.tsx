@@ -1,17 +1,32 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { CrossmintPayButton } from '@crossmint/client-sdk-react-ui';
+import { getSmartWallet } from '../service/wallet';
 
 interface Props {
+    uid: string;
     closeModal: () => void;
 }
 
-const NftPurchaseModal: React.FC<Props> = ({ closeModal }) => {
+const NftPurchaseModal: React.FC<Props> = ({ uid, closeModal }) => {
+    const [smartwallet, setSmartWallet] = useState<string>("");
     const projectId = '412da5ae-a860-4cb3-9969-55948e5c327f';
     const collectionId = '9c4490e9-e795-4280-b138-85ffe2c64910';
     const environment = 'staging';
     const myWalletAddress = '0x4dC65015ce1c7CfC5Cb62d37051a888aa0FEA757'; // TODO: Crossmintのwalletアドレスを取得して渡すようにする
+
+    const getSmartWalletAddress = async () => {
+        console.log('getSmartWalletAddress');
+        const smartwalletAddress = await getSmartWallet(uid);
+        console.log(smartwalletAddress);
+        setSmartWallet(smartwalletAddress);
+        
+    }
+
+    useEffect(() => {
+        getSmartWalletAddress();
+    }, []);
 
     return (
         <Overlay onClick={(e) => e.target === e.currentTarget && closeModal()}>
