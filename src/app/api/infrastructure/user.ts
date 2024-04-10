@@ -13,6 +13,7 @@ export const getUserData = async (uid: string) => {
         claimableReward: Number(userSnap!.claimable_reward),
         totalClaimed: Number(userSnap!.total_claimed),
         mailAddress: String(userSnap!.mail_address),
+        characterNftFlg: Boolean(userSnap!.character_nft_flg),
         purchasedNftFlg: Boolean(userSnap!.purchased_nft_flg),
     };
     return userData;

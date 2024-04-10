@@ -13,3 +13,13 @@ export const setUserLifeAndPurchaseFlg = (uid: string) => {
     };
     setUserData(uid, updateUserData);
 };
+
+export const setUserLifeNftAndPurchaseFlg = (uid: string, tokenId: number) => {
+    console.log('start setUserLifeNftAndPurchaseFlg');
+    const updateUserData = {
+        life: 20,
+        life_nft_token_id: tokenId,
+        purchased_nft_flg: true,
+    };
+    setUserData(uid, updateUserData);
+}
