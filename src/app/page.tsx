@@ -164,7 +164,6 @@ export default function App() {
     };
 
     const loginUserHeaderArea = () => {
-        console.log(user?.purchasedNftFlg);
         return (
             // TODO: blockchain接続後、src入れかえ
             <>

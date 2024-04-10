@@ -51,7 +51,7 @@ export default function LoginPage() {
                         setIsVerifyNavigation(true);
                     } else {
                         console.log('success login');
-                        initAuth(firebaseAuthStore, web3AuthStore);
+                        // initAuth(firebaseAuthStore, web3AuthStore);
                         router.push('/');
                     }
                 } else {

@@ -3,10 +3,11 @@ type User = {
     userId: string;
     name: string;
     life: number;
+    lifeNftTokenId: number;
     claimableReward: number;
     totalClaimed: number;
     mailAddress: string;
-    purchasedNftFlg: boolean;
+    walletAddress: string;
     characterNftFlg: boolean;
 };
 

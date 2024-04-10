@@ -2,7 +2,7 @@ import { Contract, JsonRpcProvider } from 'ethers';
 import { NextRequest, NextResponse } from 'next/server';
 import { characterNftAbi, lifeNftAbi, smartWalletAbi } from './abis';
 import { getSnapByQuery } from '../../infrastructure/firestore/firestore';
-import { setUserLifeNftAndPurchaseFlg } from '../../services/user';
+import { setUserLifeNft } from '../../services/user';
 
 interface PostParameters {
     type: string;
@@ -75,7 +75,7 @@ export const POST = async (req: NextRequest) => {
         console.log(userId);
 
         // update firestore user purchased & life
-        setUserLifeNftAndPurchaseFlg(userId, lifeNftTokenId);
+        setUserLifeNft(userId, lifeNftTokenId);
     }
 
     return NextResponse.json('000');

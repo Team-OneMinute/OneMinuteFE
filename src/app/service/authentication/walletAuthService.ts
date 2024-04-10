@@ -24,7 +24,7 @@ export const walletAuthInit = async (firebaseAuthStore: FirebaseAuthStore, web3A
     } catch (err) {
         throw new Error('Invalid wallet authentication init.');
     }
-    connectWeb3Auth(web3AuthStore, uid!, idToken!);
+    await connectWeb3Auth(web3AuthStore, uid!, idToken!);
 };
 
 const invalidCheck = (uid: string | null, idToken: string | null) => {
