@@ -5,11 +5,19 @@ export const getUser = async (uid: string) => {
     return userData;
 };
 
-export const setUserLifeAndPurchaseFlg = (uid: string) => {
-    console.log('start update');
+export const setUserLifeNft = (uid: string, tokenId: number) => {
+    console.log('start setUserLifeNftAndPurchaseFlg');
     const updateUserData = {
         life: 20,
-        purchased_nft_flg: true,
+        life_nft_token_id: tokenId,
+    };
+    setUserData(uid, updateUserData);
+};
+
+export const setUserWalletAddress = (uid: string, address: string) => {
+    console.log('start setUserWalletAddress');
+    const updateUserData = {
+        wallet_address: address,
     };
     setUserData(uid, updateUserData);
 };

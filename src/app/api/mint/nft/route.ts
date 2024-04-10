@@ -23,7 +23,7 @@ export const POST = async (req: NextRequest) => {
     // TODO: exist user check
     if (!existUser(uid)) return;
     try {
-        const res = await mintCharacterNft(walletAddress, imageUrl);
+        const res = await mintCharacterNft(uid, walletAddress, imageUrl);
         console.log("es start");
         console.log(res);
         const response = {

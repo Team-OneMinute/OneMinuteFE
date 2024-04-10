@@ -2,6 +2,7 @@ import { PrivateKeyProvider, Web3Auth, Web3AuthOptions } from '@web3auth/single-
 import { CHAIN_NAMESPACES } from '@web3auth/base';
 import { EthereumPrivateKeyProvider } from '@web3auth/ethereum-provider';
 import { Web3AuthStore } from '@/app/store/StoreProvider';
+import { Eip1193Provider, ethers } from 'ethers';
 
 // TODO: add env file
 const clientId = 'BDvwsfMRP29PwNqUbOStvQiLlCeJrGYfxxzbbJ7CwW1IeVp37nISy9NGIrWwM_yuUgXm5yWvvHednxBEPxoGguQ';
@@ -68,4 +69,16 @@ export const connectWeb3Auth = async (web3AuthStore: Web3AuthStore, uid: string,
             dispatch({ type: 'FINISH_CONNECT', payload: web3Auth });
         });
     });
+};
+
+export const getWalletAddress = async (web3AuthStore: Web3AuthStore): Promise<string> => {
+    const web3Auth = web3AuthStore.state.web3Auth;
+    if (!web3Auth) {
+        return "";
+    }
+    const ethersProvider = new ethers.BrowserProvider(web3Auth.provider as Eip1193Provider);
+    const signer = await ethersProvider.getSigner();
+    // Get the user's Ethereum public address
+    const userWalletAddress = await signer.getAddress();
+    return userWalletAddress;
 };
