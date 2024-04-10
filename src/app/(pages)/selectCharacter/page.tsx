@@ -1,17 +1,18 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { use, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Puff } from 'react-loader-spinner';
 
 // service
 import { ButtonBase } from '@/app/component/Atoms/Button';
-import { getCredential } from '@/app/service/authentication';
 import { selectCharacter } from '@/app/service/character';
 import { getUser, setCharacterFlgInUser } from '@/app/service/user';
 import { useRouter } from 'next/navigation';
 
 // component
 import { SelectedCharacterModal } from '@/app/component/SelectedCharacterModal';
+import { StoreContext } from '@/app/store/StoreProvider';
+import { getLoginUser, getUserAuth } from '@/app/service/authentication/userAuthService';
 
 // TODO: NFTを持っていない人が絶対にここの画面に来ないようにする
 // TODO: ↑フロント、バックエンドの両方をチェックしないといけない
@@ -22,7 +23,8 @@ export default function SelectCharacterPage() {
     const [submitCharacter, setSubmitCharacter] = useState<boolean>(false);
     const [mintLoading, setMintLoading] = useState<boolean>(false);
     const characterNum = 4;
-    const [tokenId, setTokenId] = useState<string>("");
+    const [tokenId, setTokenId] = useState<string>('');
+    const { firebaseAuthStore, web3AuthStore } = useContext(StoreContext);
 
     const tmpPathHead = '/static/images/temp/character/character';
     const tmpPathTail = '.png';
@@ -32,11 +34,15 @@ export default function SelectCharacterPage() {
     };
 
     const fetchUser = async () => {
-        const userCredential = getCredential();
-        if (userCredential === undefined || userCredential === null) {
+        const userAuth = getUserAuth(firebaseAuthStore);
+        if (!userAuth) {
+            return;
+        }
+        const user = getLoginUser(userAuth);
+        if (user === undefined || user === null) {
             router.push('/');
         }
-        const userData = await getUser(userCredential!.uid);
+        const userData = await getUser(user!.uid);
         setUser(userData);
     };
 
@@ -45,7 +51,7 @@ export default function SelectCharacterPage() {
     }, []);
 
     useEffect(() => {
-        if (tokenId != "") {
+        if (tokenId != '') {
             setMintLoading(false);
         }
     }, [tokenId]);
@@ -80,7 +86,6 @@ export default function SelectCharacterPage() {
         const tokenId = result.relayResponse.tokenId;
         setTokenId(tokenId);
         const baseUrl = result.baseUrl;
-
     };
 
     const modalOnclickHandler = () => {
@@ -104,17 +109,17 @@ export default function SelectCharacterPage() {
             <InfoArea>
                 <InfoText>character info</InfoText>
             </InfoArea>
-                <LoadingArea>
-                    <Puff
-                        visible={mintLoading}
-                        height='80'
-                        width='80'
-                        color='#4fa94d'
-                        ariaLabel='puff-loading'
-                        wrapperStyle={{}}
-                        wrapperClass=''
-                    />
-                </LoadingArea>
+            <LoadingArea>
+                <Puff
+                    visible={mintLoading}
+                    height='80'
+                    width='80'
+                    color='#4fa94d'
+                    ariaLabel='puff-loading'
+                    wrapperStyle={{}}
+                    wrapperClass=''
+                />
+            </LoadingArea>
             {tokenId != '' && mintLoading == false && (
                 <SelectedCharacterModal
                     title='Congratulation'
@@ -202,9 +207,9 @@ const ButtonArea = styled.div`
 
 const LoadingArea = styled.div`
     position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
 `;

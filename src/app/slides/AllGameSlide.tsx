@@ -28,7 +28,6 @@ const AllGameSlide: React.FC<props> = ({
     setSelectedGameId,
     setIsOpenDetailModal,
 }) => {
-    console.log('selectedGameId: ' + selectedGameId);
     const positionSet = [
         { x: 20, y: 20 },
         { x: 80, y: 80 },
