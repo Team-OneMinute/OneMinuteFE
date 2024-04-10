@@ -1,5 +1,5 @@
 'use client';
-import React, { use, useContext, useEffect, useState } from 'react';
+import React, { use, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Puff } from 'react-loader-spinner';
 
@@ -13,9 +13,8 @@ import { useRouter } from 'next/navigation';
 import { SelectedCharacterModal } from '@/app/component/SelectedCharacterModal';
 import { StoreContext } from '@/app/store/StoreProvider';
 import { getLoginUser, getUserAuth } from '@/app/service/authentication/userAuthService';
+import { initAuth } from '@/app/service/authentication/authentication';
 
-// TODO: NFTを持っていない人が絶対にここの画面に来ないようにする
-// TODO: ↑フロント、バックエンドの両方をチェックしないといけない
 export default function SelectCharacterPage() {
     const router = useRouter();
     const [selectedImgID, setSelectedGameId] = useState<number>(0);
@@ -23,7 +22,8 @@ export default function SelectCharacterPage() {
     const [submitCharacter, setSubmitCharacter] = useState<boolean>(false);
     const [mintLoading, setMintLoading] = useState<boolean>(false);
     const characterNum = 4;
-    const [tokenId, setTokenId] = useState<string>('');
+    const [taskId, setTokenId] = useState<string>('');
+    const didLogRef = useRef<boolean>(false);
     const { firebaseAuthStore, web3AuthStore } = useContext(StoreContext);
 
     const tmpPathHead = '/static/images/temp/character/character';
@@ -47,21 +47,28 @@ export default function SelectCharacterPage() {
     };
 
     useEffect(() => {
+        if (didLogRef.current === false) {
+            didLogRef.current = true;
+        } else {
+            (async () => {
+                await initAuth(firebaseAuthStore, web3AuthStore);
+            })();
+        }
         fetchUser();
     }, []);
 
     useEffect(() => {
-        if (tokenId != '') {
+        if (taskId != '') {
             setMintLoading(false);
         }
-    }, [tokenId]);
+    }, [taskId]);
 
     const inActiveCharacter = () => {
         const imgList = [];
         for (let i = 0; i < characterNum; i++) {
             if (i != selectedImgID) {
                 const fullPath = `${tmpPathHead}${i}${tmpPathTail}`;
-                imgList.push(<InActiveCharacterImage src={fullPath} onClick={() => onClickImg(i)} />);
+                imgList.push(<InActiveCharacterImage key={`${i}`} src={fullPath} onClick={() => onClickImg(i)} />);
             }
         }
         return imgList;
@@ -77,15 +84,17 @@ export default function SelectCharacterPage() {
         setSubmitCharacter(true);
 
         // TODO: Web3Auth get
-        const walletAddress = '0x9E20124F51e236D008886713a8FA6F522472892B';
+        const walletAddress = '0x18aEFe337E68f5Bd3e18Ba09960f9136754590a6';
 
         setMintLoading(true);
         const result = await selectCharacter(user!.userId, walletAddress, String(selectedImgID));
         // // TODO: add banner while claiming thr nft
         // // https://github.com/gelatodigital/gelato-thirdweb-relay/blob/master/src/components/apps/GaslessNFTApp.tsx#L94
-        const tokenId = result.relayResponse.tokenId;
-        setTokenId(tokenId);
+        const taskId = result.relayResponse.taskId;
         const baseUrl = result.baseUrl;
+
+
+        setTokenId(taskId);
     };
 
     const modalOnclickHandler = () => {
@@ -109,7 +118,7 @@ export default function SelectCharacterPage() {
             <InfoArea>
                 <InfoText>character info</InfoText>
             </InfoArea>
-            <LoadingArea>
+            <LoadingArea hidden={!mintLoading}>
                 <Puff
                     visible={mintLoading}
                     height='80'
@@ -120,7 +129,7 @@ export default function SelectCharacterPage() {
                     wrapperClass=''
                 />
             </LoadingArea>
-            {tokenId != '' && mintLoading == false && (
+            {taskId != '' && mintLoading == false && (
                 <SelectedCharacterModal
                     title='Congratulation'
                     explanation='Character creating... wait a minute'
@@ -205,7 +214,8 @@ const ButtonArea = styled.div`
     padding: 3% 20%;
 `;
 
-const LoadingArea = styled.div`
+const LoadingArea = styled.div<{ hidden: boolean }>`
+    ${(props) => (props.hidden ? 'display: none;' : '')}
     position: absolute;
     top: 0;
     right: 0;
