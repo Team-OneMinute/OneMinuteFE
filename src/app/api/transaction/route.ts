@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ethers, { Contract, Interface, JsonRpcProvider } from 'ethers';
 import abi from './abi.json' assert { type: 'json' };
+import { getUser } from '@/app/service/user';
 
 export const GET = async (req: NextRequest) => {
     const { searchParams } = new URL(req.url);
     const uid = searchParams.get('uid');
-    console.log("query");
-    console.log(uid);
+
+    if (uid === null || uid === "") {
+        return NextResponse.json('001');
+    }
+
+    const userData = getUser(uid);
+    // add walletaddress & btokenID from userdata
+
     try {
         const walletAddress = '0x18aEFe337E68f5Bd3e18Ba09960f9136754590a6';
         const characterNftContractAddress = '0x093d8549D8cBcF5844B23f508ac2c1687E92862D';
