@@ -241,9 +241,9 @@ export default function App() {
                             togglePurchaseModal={togglePurchaseModal}
                         />
                     )}
-                    {isOpenPurchaseModal && (
+                    {isOpenPurchaseModal && user &&(
                         <>
-                            <NftPurchaseModal closeModal={() => togglePurchaseModal()} />
+                            <NftPurchaseModal uid={user.userId} closeModal={() => togglePurchaseModal()} />
                         </>
                     )}
                 </>
