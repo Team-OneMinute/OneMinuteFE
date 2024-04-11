@@ -1,10 +1,12 @@
 // util
 import { emailUrlEncode } from '@/app/utils/emailUrlEncode';
 
-const API_KEY =
-    'sk_staging_2552NTfz81CkBiSQs3exGvkQcxBXmKGSNy2S4DG6GHtDjZ334mTk59bwtCajbyeg9BBGiy8im6ApZCAV7QcoFWeENHB2EmER1MXvcdZCNQpcaumR4drkjRhvVYKBwkKFUkMKqtGBzVC2mYiWc4FiUdRgcwxaE4bFkMvicDRjXpysgW1nBUQSbefW2BEZeHTh1G4MKvm8eiUE3uL4M98shyd';
+const apiKey = process.env.CROSSMINT_SERVER_API_KEY;
 
 export const fetchNft = async (email: string) => {
+    if (!apiKey) {
+        throw new Error('failed to load env in fetchNft');
+    }
     // fetch nft in wallet from email
     // TODO: into env file
     const CHAIN = 'zkatana';
@@ -18,7 +20,7 @@ export const fetchNft = async (email: string) => {
     const options = {
         method: 'GET',
         headers: {
-            'X-API-KEY': API_KEY,
+            'X-API-KEY': apiKey,
         },
     };
 

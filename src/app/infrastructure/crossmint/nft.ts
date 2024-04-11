@@ -1,9 +1,12 @@
 // utils
 import { emailUrlEncode } from '@/app/utils/emailUrlEncode';
 
+const apiKey = process.env.CROSSMINT_CLIENT_API_KEY;
+
 export const getMyNft = (mailAddress: string) => {
-    const apiKey =
-        'ck_staging_5ixm3ij57utqcHuAKtiWyJEbFgZUnbd91xHKbB7cEVX5CpPz7dF6H6xGvxbjpX7Tn1yAB67fdEev2fEfRhzBRPWtuVAKLtbvBkH9d9rgv7ChKf8QM6dHsQuw1CTUfsByUEi4Zh6cfm76GCxVJHM23pSxHFp7Dv7QoqwVSn8EMAWPi1CZ5kHdcBitUHxUunHzpv5v32oKenHxfzpw7jk8s8jc';
+    if (!apiKey) {
+        throw new Error('failed to load env in getMyNft');
+    }
     const chain = 'zkatana';
     const baseHeadURL = 'https://staging.crossmint.com/api/2022-06-09/wallets/';
     const baseTailURL = '/nfts?page=1&perPage=20';
