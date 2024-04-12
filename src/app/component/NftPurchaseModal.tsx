@@ -21,11 +21,12 @@ const NftPurchaseModal: React.FC<Props> = ({ uid, closeModal }) => {
         const smartwalletAddress = await getSmartWallet(uid);
         console.log(smartwalletAddress);
         setSmartWallet(smartwalletAddress);
-        
     }
 
     useEffect(() => {
-        getSmartWalletAddress();
+        (async () => {
+            await getSmartWalletAddress();
+        })();
     }, []);
 
     return (
@@ -34,7 +35,7 @@ const NftPurchaseModal: React.FC<Props> = ({ uid, closeModal }) => {
                 <InfoArea>Can't play not buy nft</InfoArea>
                 <PaymentButtonArea>
                     <CrossmintPayButton
-                        mintTo={myWalletAddress}
+                        mintTo={smartwallet}
                         projectId={projectId}
                         collectionId={collectionId}
                         environment={environment}

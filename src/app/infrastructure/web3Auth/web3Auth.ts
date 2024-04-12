@@ -3,30 +3,16 @@ import { CHAIN_NAMESPACES } from '@web3auth/base';
 import { EthereumPrivateKeyProvider } from '@web3auth/ethereum-provider';
 import { Web3AuthStore } from '@/app/store/StoreProvider';
 import { Eip1193Provider, ethers } from 'ethers';
-
-// TODO: add env file
-const clientId = 'BDvwsfMRP29PwNqUbOStvQiLlCeJrGYfxxzbbJ7CwW1IeVp37nISy9NGIrWwM_yuUgXm5yWvvHednxBEPxoGguQ';
-
-// TODO: add env file
-const chainConfig = {
-    chainId: '0x5c2359',
-    displayName: 'zKyoto testnet',
-    chainNamespace: CHAIN_NAMESPACES.EIP155,
-    tickerName: 'Ethereum',
-    ticker: 'ETH',
-    decimals: 18,
-    rpcTarget: 'https://rpc.startale.com/zkyoto',
-    blockExplorer: 'https://zkyoto.explorer.startale.com/',
-};
+import { web3AuthChainConfig, web3AuthClientId } from './web3AuthConfig';
 
 // Initializing Ethereum Provider
 export const privateKeyProvider = new EthereumPrivateKeyProvider({
-    config: { chainConfig },
+    config: { chainConfig: web3AuthChainConfig },
 });
 
 export const web3AuthOptions: Web3AuthOptions = {
-    clientId: clientId, 
-    web3AuthNetwork: 'sapphire_devnet', 
+    clientId: web3AuthClientId,
+    web3AuthNetwork: 'sapphire_devnet',
     usePnPKey: false,
 };
 
